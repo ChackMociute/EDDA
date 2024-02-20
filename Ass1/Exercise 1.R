@@ -27,7 +27,100 @@ c(2*mean(Tstar) - quantile(Tstar, 1 - alpha/2), 2*mean(Tstar) - quantile(Tstar, 
 t.test(data$video, mu=50, alternative="greater")
 t.test(data$video, mu=51, alternative="greater")
 
+
 # c)
+binom.test(sum(data$video>50), length(data$video), alternative='g')
+wilcox.test(data$video, mu=50, alternative='g')
+
+sum(data$video<42)/length(data$video) <= 0.25
+
+
+# d)
+# Bootstrap test
+B = 10000
+t = min(data$video)
+Tstar = numeric(B)
+means = NULL
+for(m in 0:100){
+  for(i in 1:B)
+    Tstar[i] = min(rnorm(length(data$video), mean=m, sd=10))
+  if(2*min(sum(Tstar<t)/B, sum(Tstar>t)/B) > 0.05)
+    means = c(means, m)
+}
+length(min(means):max(means)) == length(means)
+range(means)
+
+# Kolmogorov-Smirnov test
+means = NULL
+for(m in 0:100){
+  if(ks.test(data$video, pnorm, m, 10)[[2]] > 0.05)
+    means = c(means, m)
+}
+length(min(means):max(means)) == length(means)
+range(means)
+
+# More precise KS test
+means = NULL
+for(m in seq(51, 54, by=0.001)){
+  if(ks.test(data$video, pnorm, m, 10)[[2]] > 0.05)
+    means = c(means, m)
+}
+length(seq(min(means), max(means), by=0.001)) == length(means)
+range(means)
+
+
+# e)
+fvideo = data$video[data$female == 1]
+mvideo = data$video[data$female == 0]
+
+t.test(mvideo, fvideo, alternative='g')
+wilcox.test(mvideo, fvideo, alternative='g')
+ks.test(mvideo, fvideo, alternative='l')
+
+par(mfrow=c(2, 3))
+qqnorm(fvideo)
+hist(fvideo)
+shapiro.test(fvideo)
+boxplot(fvideo, mvideo)
+qqnorm(mvideo)
+hist(mvideo)
+shapiro.test(mvideo)
+
+
+# f)
+cor.test(data$video, data$puzzle)
+cor.test(data$video, data$puzzle, method='spearman')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
