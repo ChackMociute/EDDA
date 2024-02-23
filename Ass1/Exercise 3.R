@@ -25,6 +25,6 @@ friedman.test(acidity ~ starter | batch, data)
 lm1 = lmer(acidity ~ starter + (1|batch) + (1|position), data)
 lm2 = lmer(acidity ~ (1|batch) + (1|position), data)
 anova(lm1, lm2)
-
-
-
+summary(lm1)
+par(mfrow=c(1,))
+plot(fitted(lm1), residuals(lm1))

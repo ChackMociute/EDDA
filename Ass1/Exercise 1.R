@@ -7,6 +7,7 @@ summary(data$video)
 par(mfrow=c(1, 2))
 hist(data$video)
 qqnorm(data$video)
+shapiro.test(rnorm(1000))
 
 # CI
 alpha = 0.03
@@ -77,16 +78,16 @@ t.test(mvideo, fvideo, alternative='g')
 wilcox.test(mvideo, fvideo, alternative='g')
 ks.test(mvideo, fvideo, alternative='l')
 
-par(mfrow=c(2, 3))
-qqnorm(fvideo)
-hist(fvideo)
-shapiro.test(fvideo)
-boxplot(fvideo, mvideo)
-qqnorm(mvideo)
-hist(mvideo)
-shapiro.test(mvideo)
+par(mfrow=c(2, 2))
+qqnorm(fvideo); qqnorm(mvideo)
+hist(fvideo); hist(mvideo)
+shapiro.test(fvideo); shapiro.test(mvideo)
 
 
 # f)
 cor.test(data$video, data$puzzle)
 cor.test(data$video, data$puzzle, method='spearman')
+
+qqnorm(data$video); qqnorm(data$puzzle)
+hist(data$video); hist(data$puzzle)
+shapiro.test(data$video); shapiro.test(data$puzzle)

@@ -1,0 +1,35 @@
+---
+title: "Assignment 1"
+author: "Martynas Vaznonois, Andrei xxxxx, Carlo xxxxx (Group 1)"
+date: "23 February 2024"
+output: pdf_document
+highlight: tango
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+`r options(digits=3)`
+`r data <- read.csv("Ice_cream-1.csv")`
+
+## Exercise 1
+
+**a)** The histogram and the qq plot look fairly indicative of normality but the Shapiro-Wilk test provides evidence for the contrary.
+
+```{r, fig.height=3, fig.width=6}
+par(mfrow=c(1, 2)); hist(data$video, freq=T, main="Histogram of video"); qqnorm(data$video)
+shapiro.test(data$video)
+```
+
+Assuming normality, especially with a sample size $n>30$ we use the z-score instead of the $t_{n-1}$-score to compute the 97% confidence interval.
+
+```{r}
+alpha = 0.03
+ci <- qnorm(1 - alpha/2) * sd(data$video) / sqrt(length(data$video))
+c(mean(data$video) - ci, mean(data$video) + ci)
+```
+
+
+
+
+
