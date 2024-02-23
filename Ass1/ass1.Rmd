@@ -10,26 +10,160 @@ editor_options:
 ---
 
 `r options(digits=3)`
+`r options(warn=-1)`
 `r data <- read.csv("Ice_cream-1.csv")`
+
 
 ## Exercise 1
 
 **a)** The histogram and the qq plot look fairly indicative of normality but the Shapiro-Wilk test provides evidence for the contrary.
 
 ```{r, fig.height=3, fig.width=6}
-par(mfrow=c(1, 2)); hist(data$video, freq=T, main="Histogram of video"); qqnorm(data$video)
+par(mfrow=c(1, 2)); qqnorm(data$video)
+hist(data$video, freq=T, main="Histogram of video", xlab="Video")
 shapiro.test(data$video)
 ```
 
-Assuming normality, especially with a sample size $n>30$ we use the z-score instead of the $t_{n-1}$-score to compute the 97% confidence interval.
+Assuming normality, especially with a sample size $n>30$, we use the z-score instead of the $t_{n-1}$-score to compute the 97% confidence interval. Rearranging the formula, we find the number of participants needed to make the CI at most 3. Finally, we compute the bootstrap CI by simulating sampling from the same distribution and calculating the mean test statistics.
 
 ```{r}
+# CI
 alpha = 0.03
 ci <- qnorm(1 - alpha/2) * sd(data$video) / sqrt(length(data$video))
 c(mean(data$video) - ci, mean(data$video) + ci)
+
+# Participants
+n <- (qnorm(1 - alpha/2) * sd(data$video) / (3/2))^2; ceiling(n)
+
+# Bootstrap CI
+B = 100000
+Tstar = numeric(B)
+for(i in 1:B)
+  Tstar[i] = mean(sample(data$video, replace=T))
+c(2*mean(Tstar) - quantile(Tstar, 1 - alpha/2), 2*mean(Tstar) - quantile(Tstar, alpha/2))
+```
+
+**b)** The first test below shows that the $H_0$ is rejected ($p<0.001$). The confidence interval for the true mean is $(50.69; \infty)$. This shows that the true mean can be find within that interval with 95% certainty. Because the mean of 50 under $H_0$ is not in that interval, the probability of $H_0$ being true is less than 5%, leading ti its rejection. Under the second test, the $\mu_0$ is within that same interval, which is why the p-value is above 0.05 and why $H_0$ cannot be rejected.
+
+```{r}
+t.test(data$video, mu=50, alternative="greater")
+t.test(data$video, mu=51, alternative="greater")
 ```
 
 
+**c)** The first test below is the sign (binomial) test. It assumes $H_0: m=50$ to be the median and if the $H_0$ is correct, then there should be approximately the same number of observations to the right and left of it. The Wilcoxon test also considers ranks to make stronger predictions. Comparing to **b)**, the t-tests require the data to be normally distributed which is unclear in our case. The two latter tests do not make such an assumption which may make them more applicable. On the other hand, they throw away more information, and in the case of the sign test, so much information has been lost that $H_0$ cannot be rejected, like it was with the t-test. The Wilcoxon test only assumes symmetrical distribution, which seems likely. And it, like the t-test, provides enough evidence to reject $H_0$
+
+```{r}
+binom.test(sum(data$video>50), length(data$video), alternative='g')
+wilcox.test(data$video, mu=50, alternative='g')
+```
+
+Testing whether less than 25% of the data falls below 42 comes down to calculating the fraction of the data below 42 and checking if it is less than 0.25.
+
+```{r}
+sum(data$video<42)/length(data$video) <= 0.25
+```
 
 
+**d)** 
 
+```{r}
+# Bootstrap test
+B = 10000
+t = min(data$video)
+Tstar = numeric(B)
+means = NULL
+for(m in 0:100){
+  for(i in 1:B)
+    Tstar[i] = min(rnorm(length(data$video), mean=m, sd=10))
+  if(2*min(sum(Tstar<t)/B, sum(Tstar>t)/B) > 0.05)
+    means = c(means, m)
+}
+range(means)
+
+# Kolmogorov-Smirnov test
+means = NULL
+for(m in 0:100){
+  if(ks.test(data$video, pnorm, m, 10)[[2]] > 0.05)
+    means = c(means, m)
+}
+range(means)
+
+# More precise KS test
+means = NULL
+for(m in seq(51, 54, by=0.001)){
+  if(ks.test(data$video, pnorm, m, 10)[[2]] > 0.05)
+    means = c(means, m)
+}
+range(means)
+```
+
+
+**e)** 
+
+```{r}
+```
+
+
+**f)** 
+
+```{r}
+```
+
+
+## Exercise 2
+
+**a)** 
+
+```{r}
+```
+
+
+**b)** 
+
+```{r}
+```
+
+
+**c)** 
+
+```{r}
+```
+
+
+**d)** 
+
+```{r}
+```
+
+
+**e)** 
+
+```{r}
+```
+
+
+## Exercise 3
+
+**a)** 
+
+```{r}
+```
+
+
+**b)** 
+
+```{r}
+```
+
+
+**c)** 
+
+```{r}
+```
+
+
+**d)** 
+
+```{r}
+```
