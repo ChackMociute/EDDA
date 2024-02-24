@@ -1,0 +1,988 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Assignment 1},
+  pdfauthor={Martynas Vaznonois, Andrei Puchkov, Carlo Peron (Group 1)},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Assignment 1}
+\author{Martynas Vaznonois, Andrei Puchkov, Carlo Peron (Group 1)}
+\date{23 February 2024}
+
+\begin{document}
+\maketitle
+
+\hypertarget{exercise-1}{%
+\subsection{Exercise 1}\label{exercise-1}}
+
+\textbf{a)} The histogram and the qq plot look fairly indicative of
+normality but the Shapiro-Wilk test provides evidence for the contrary.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{)); }\FunctionTok{qqnorm}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video)}
+\FunctionTok{hist}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video, }\AttributeTok{freq=}\NormalTok{T, }\AttributeTok{main=}\StringTok{"Histogram of video"}\NormalTok{, }\AttributeTok{xlab=}\StringTok{"Video"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ass1_files/figure-latex/unnamed-chunk-1-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{shapiro.test}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  data$video
+## W = 1, p-value = 0.03
+\end{verbatim}
+
+Assuming normality, especially with a sample size \(n>30\), we use the
+z-score instead of the \(t_{n-1}\)-score to compute the 97\% confidence
+interval. Rearranging the formula, we find the number of participants
+needed to make the CI at most 3. Finally, we compute the bootstrap CI by
+simulating sampling from the same distribution and calculating the mean
+test statistics.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# CI}
+\NormalTok{alpha }\OtherTok{=} \FloatTok{0.03}
+\NormalTok{ci }\OtherTok{\textless{}{-}} \FunctionTok{qnorm}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ alpha}\SpecialCharTok{/}\DecValTok{2}\NormalTok{) }\SpecialCharTok{*} \FunctionTok{sd}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video) }\SpecialCharTok{/} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{length}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video))}
+\FunctionTok{c}\NormalTok{(}\FunctionTok{mean}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video) }\SpecialCharTok{{-}}\NormalTok{ ci, }\FunctionTok{mean}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video) }\SpecialCharTok{+}\NormalTok{ ci)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 50.3 53.4
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Participants}
+\NormalTok{n }\OtherTok{\textless{}{-}}\NormalTok{ (}\FunctionTok{qnorm}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ alpha}\SpecialCharTok{/}\DecValTok{2}\NormalTok{) }\SpecialCharTok{*} \FunctionTok{sd}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video) }\SpecialCharTok{/}\NormalTok{ (}\DecValTok{3}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{; }\FunctionTok{ceiling}\NormalTok{(n)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 206
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Bootstrap CI}
+\NormalTok{B }\OtherTok{=} \DecValTok{100000}
+\NormalTok{Tstar }\OtherTok{=} \FunctionTok{numeric}\NormalTok{(B)}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{B)}
+\NormalTok{  Tstar[i] }\OtherTok{=} \FunctionTok{mean}\NormalTok{(}\FunctionTok{sample}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video, }\AttributeTok{replace=}\NormalTok{T))}
+\FunctionTok{c}\NormalTok{(}\DecValTok{2}\SpecialCharTok{*}\FunctionTok{mean}\NormalTok{(Tstar) }\SpecialCharTok{{-}} \FunctionTok{quantile}\NormalTok{(Tstar, }\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ alpha}\SpecialCharTok{/}\DecValTok{2}\NormalTok{), }\DecValTok{2}\SpecialCharTok{*}\FunctionTok{mean}\NormalTok{(Tstar) }\SpecialCharTok{{-}} \FunctionTok{quantile}\NormalTok{(Tstar, alpha}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 98.5%  1.5% 
+##  50.4  53.4
+\end{verbatim}
+
+\textbf{b)} The first test below shows that the \(H_0\) is rejected
+(\(p<0.001\)). The confidence interval for the true mean is
+\((50.69; \infty)\). This shows that the true mean can be find within
+that interval with 95\% certainty. Because the mean of 50 under \(H_0\)
+is not in that interval, the probability of \(H_0\) being true is less
+than 5\%, leading ti its rejection. Under the second test, the \(\mu_0\)
+is within that same interval, which is why the p-value is above 0.05 and
+why \(H_0\) cannot be rejected.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{t.test}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video, }\AttributeTok{mu=}\DecValTok{50}\NormalTok{, }\AttributeTok{alternative=}\StringTok{"greater"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  One Sample t-test
+## 
+## data:  data$video
+## t = 3, df = 199, p-value = 0.004
+## alternative hypothesis: true mean is greater than 50
+## 95 percent confidence interval:
+##  50.7  Inf
+## sample estimates:
+## mean of x 
+##      51.9
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{t.test}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video, }\AttributeTok{mu=}\DecValTok{51}\NormalTok{, }\AttributeTok{alternative=}\StringTok{"greater"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  One Sample t-test
+## 
+## data:  data$video
+## t = 1, df = 199, p-value = 0.1
+## alternative hypothesis: true mean is greater than 51
+## 95 percent confidence interval:
+##  50.7  Inf
+## sample estimates:
+## mean of x 
+##      51.9
+\end{verbatim}
+
+\textbf{c)} The first test below is the sign (binomial) test. It assumes
+\(H_0: m=50\) to be the median and if the \(H_0\) is correct, then there
+should be approximately the same number of observations to the right and
+left of it. The Wilcoxon test also considers ranks to make stronger
+predictions. Comparing to \textbf{b)}, the t-tests require the data to
+be normally distributed which is unclear in our case. The two latter
+tests do not make such an assumption which may make them more
+applicable. On the other hand, they throw away more information, and in
+the case of the sign test, so much information has been lost that
+\(H_0\) cannot be rejected, like it was with the t-test. The Wilcoxon
+test only assumes symmetrical distribution, which seems likely. And it,
+like the t-test, provides enough evidence to reject \(H_0\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{binom.test}\NormalTok{(}\FunctionTok{sum}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video}\SpecialCharTok{\textgreater{}}\DecValTok{50}\NormalTok{), }\FunctionTok{length}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video), }\AttributeTok{alternative=}\StringTok{\textquotesingle{}g\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Exact binomial test
+## 
+## data:  sum(data$video > 50) and length(data$video)
+## number of successes = 108, number of trials = 200, p-value = 0.1
+## alternative hypothesis: true probability of success is greater than 0.5
+## 95 percent confidence interval:
+##  0.479 1.000
+## sample estimates:
+## probability of success 
+##                   0.54
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{wilcox.test}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video, }\AttributeTok{mu=}\DecValTok{50}\NormalTok{, }\AttributeTok{alternative=}\StringTok{\textquotesingle{}g\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Wilcoxon signed rank test with continuity correction
+## 
+## data:  data$video
+## V = 9836, p-value = 0.005
+## alternative hypothesis: true location is greater than 50
+\end{verbatim}
+
+Testing whether less than 25\% of the data falls below 42 comes down to
+calculating the fraction of the data below 42 and checking if it is less
+than 0.25.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video}\SpecialCharTok{\textless{}}\DecValTok{42}\NormalTok{)}\SpecialCharTok{/}\FunctionTok{length}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video) }\SpecialCharTok{\textless{}=} \FloatTok{0.25}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] TRUE
+\end{verbatim}
+
+\textbf{d)}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Bootstrap test}
+\NormalTok{B }\OtherTok{=} \DecValTok{10000}
+\NormalTok{t }\OtherTok{=} \FunctionTok{min}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video)}
+\NormalTok{Tstar }\OtherTok{=} \FunctionTok{numeric}\NormalTok{(B)}
+\NormalTok{means }\OtherTok{=} \ConstantTok{NULL}
+\ControlFlowTok{for}\NormalTok{(m }\ControlFlowTok{in} \DecValTok{0}\SpecialCharTok{:}\DecValTok{100}\NormalTok{)\{}
+  \ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{B)}
+\NormalTok{    Tstar[i] }\OtherTok{=} \FunctionTok{min}\NormalTok{(}\FunctionTok{rnorm}\NormalTok{(}\FunctionTok{length}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video), }\AttributeTok{mean=}\NormalTok{m, }\AttributeTok{sd=}\DecValTok{10}\NormalTok{))}
+  \ControlFlowTok{if}\NormalTok{(}\DecValTok{2}\SpecialCharTok{*}\FunctionTok{min}\NormalTok{(}\FunctionTok{sum}\NormalTok{(Tstar}\SpecialCharTok{\textless{}}\NormalTok{t)}\SpecialCharTok{/}\NormalTok{B, }\FunctionTok{sum}\NormalTok{(Tstar}\SpecialCharTok{\textgreater{}}\NormalTok{t)}\SpecialCharTok{/}\NormalTok{B) }\SpecialCharTok{\textgreater{}} \FloatTok{0.05}\NormalTok{)}
+\NormalTok{    means }\OtherTok{=} \FunctionTok{c}\NormalTok{(means, m)}
+\NormalTok{\}}
+\FunctionTok{range}\NormalTok{(means)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 47 62
+\end{verbatim}
+
+Kolmogorov-Smirnov test, to roughly estimate the means which fit
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{means }\OtherTok{=} \ConstantTok{NULL}
+\ControlFlowTok{for}\NormalTok{(m }\ControlFlowTok{in} \DecValTok{0}\SpecialCharTok{:}\DecValTok{100}\NormalTok{)\{}
+  \ControlFlowTok{if}\NormalTok{(}\FunctionTok{ks.test}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video, pnorm, m, }\DecValTok{10}\NormalTok{)[[}\DecValTok{2}\NormalTok{]] }\SpecialCharTok{\textgreater{}} \FloatTok{0.05}\NormalTok{)}
+\NormalTok{    means }\OtherTok{=} \FunctionTok{c}\NormalTok{(means, m)}
+\NormalTok{\}}
+\FunctionTok{range}\NormalTok{(means)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 52 53
+\end{verbatim}
+
+More precise KS test
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{means }\OtherTok{=} \ConstantTok{NULL}
+\ControlFlowTok{for}\NormalTok{(m }\ControlFlowTok{in} \FunctionTok{seq}\NormalTok{(}\DecValTok{51}\NormalTok{, }\DecValTok{54}\NormalTok{, }\AttributeTok{by=}\FloatTok{0.001}\NormalTok{))\{}
+  \ControlFlowTok{if}\NormalTok{(}\FunctionTok{ks.test}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video, pnorm, m, }\DecValTok{10}\NormalTok{)[[}\DecValTok{2}\NormalTok{]] }\SpecialCharTok{\textgreater{}} \FloatTok{0.05}\NormalTok{)}
+\NormalTok{    means }\OtherTok{=} \FunctionTok{c}\NormalTok{(means, m)}
+\NormalTok{\}}
+\FunctionTok{range}\NormalTok{(means)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 51.3 53.4
+\end{verbatim}
+
+\textbf{e)}
+
+Here we create separate dataframes for male scores and female ones
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fvideo }\OtherTok{=}\NormalTok{ data}\SpecialCharTok{$}\NormalTok{video[data}\SpecialCharTok{$}\NormalTok{female }\SpecialCharTok{==} \DecValTok{1}\NormalTok{]}
+\NormalTok{mvideo }\OtherTok{=}\NormalTok{ data}\SpecialCharTok{$}\NormalTok{video[data}\SpecialCharTok{$}\NormalTok{female }\SpecialCharTok{==} \DecValTok{0}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+Then we run 3 tests on the data to check if male scores are indeed
+higher than female.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{t.test}\NormalTok{(mvideo, fvideo, }\AttributeTok{alternative=}\StringTok{\textquotesingle{}g\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Welch Two Sample t-test
+## 
+## data:  mvideo and fvideo
+## t = 2, df = 177, p-value = 0.04
+## alternative hypothesis: true difference in means is greater than 0
+## 95 percent confidence interval:
+##  0.186   Inf
+## sample estimates:
+## mean of x mean of y 
+##      53.2      50.7
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{wilcox.test}\NormalTok{(mvideo, fvideo, }\AttributeTok{alternative=}\StringTok{\textquotesingle{}g\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Wilcoxon rank sum test with continuity correction
+## 
+## data:  mvideo and fvideo
+## W = 5748, p-value = 0.03
+## alternative hypothesis: true location shift is greater than 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ks.test}\NormalTok{(mvideo, fvideo, }\AttributeTok{alternative=}\StringTok{\textquotesingle{}l\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Exact two-sample Kolmogorov-Smirnov test
+## 
+## data:  mvideo and fvideo
+## D^- = 0.2, p-value = 0.04
+## alternative hypothesis: the CDF of x lies below that of y
+\end{verbatim}
+
+Which means the expert was right.
+
+To answer about tests' applicability, we need to check the distribution
+of data. For t-test it needs to follow the \textcolor{red}{normal
+distribution}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{qqnorm}\NormalTok{(fvideo); }\FunctionTok{qqnorm}\NormalTok{(mvideo); }\FunctionTok{hist}\NormalTok{(fvideo); }\FunctionTok{hist}\NormalTok{(mvideo)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ass1_files/figure-latex/unnamed-chunk-11-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{shapiro.test}\NormalTok{(fvideo); }\FunctionTok{shapiro.test}\NormalTok{(mvideo)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  fvideo
+## W = 1, p-value = 0.3
+\end{verbatim}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  mvideo
+## W = 1, p-value = 0.06
+\end{verbatim}
+
+The test shows that the data is indeed normally distributed, although
+female video results are on the borderline.
+
+\textbf{f)} Here we apply Pearson correlation test along with Spearman
+test, which shows monotonic relationship between variables. Pearson
+shows just linear dependency in data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cor.test}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video, data}\SpecialCharTok{$}\NormalTok{puzzle)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Pearson's product-moment correlation
+## 
+## data:  data$video and data$puzzle
+## t = 7, df = 198, p-value = 4e-12
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  0.349 0.567
+## sample estimates:
+##   cor 
+## 0.465
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cor.test}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video, data}\SpecialCharTok{$}\NormalTok{puzzle, }\AttributeTok{method=}\StringTok{\textquotesingle{}spearman\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Spearman's rank correlation rho
+## 
+## data:  data$video and data$puzzle
+## S = 7e+05, p-value = 6e-13
+## alternative hypothesis: true rho is not equal to 0
+## sample estimates:
+##   rho 
+## 0.481
+\end{verbatim}
+
+We see that data is weakly correlated.
+
+Then we check the data for symmetricity and normality
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{qqnorm}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video); }\FunctionTok{qqnorm}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{puzzle);}
+\FunctionTok{hist}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video); }\FunctionTok{hist}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{puzzle)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ass1_files/figure-latex/unnamed-chunk-13-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{shapiro.test}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{video); }\FunctionTok{shapiro.test}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{puzzle)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  data$video
+## W = 1, p-value = 0.03
+\end{verbatim}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  data$puzzle
+## W = 1, p-value = 2e-05
+\end{verbatim}
+
+\hypertarget{exercise-2}{%
+\subsection{Exercise 2}\label{exercise-2}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{read.table}\NormalTok{(}\StringTok{"hemoglobin{-}1.txt"}\NormalTok{, }\AttributeTok{header=}\NormalTok{T)}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{rate }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{rate)}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{method }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{method)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{a)}
+
+\textbf{b)}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(}\FunctionTok{lm}\NormalTok{(hemoglobin}\SpecialCharTok{\textasciitilde{}}\NormalTok{rate}\SpecialCharTok{*}\NormalTok{method, }\AttributeTok{data=}\NormalTok{data))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Response: hemoglobin
+##             Df Sum Sq Mean Sq F value  Pr(>F)    
+## rate         3   90.6   30.19   19.47 2.4e-09 ***
+## method       1    2.4    2.42    1.56    0.22    
+## rate:method  3    4.9    1.62    1.05    0.38    
+## Residuals   72  111.6    1.55                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+Here we see that \textbf{method} does not have a significant impact on
+hemoglobin levels, while \textbf{rate} does.
+\textcolor{red}{comment on findings}
+
+\textbf{c)}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(}\FunctionTok{lm}\NormalTok{(hemoglobin}\SpecialCharTok{\textasciitilde{}}\NormalTok{rate}\SpecialCharTok{+}\NormalTok{method, }\AttributeTok{data=}\NormalTok{data))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Response: hemoglobin
+##           Df Sum Sq Mean Sq F value Pr(>F)    
+## rate       3   90.6   30.19   19.43  2e-09 ***
+## method     1    2.4    2.42    1.55   0.22    
+## Residuals 75  116.5    1.55                   
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(hemoglobin}\SpecialCharTok{\textasciitilde{}}\NormalTok{rate}\SpecialCharTok{+}\NormalTok{method, }\AttributeTok{data=}\NormalTok{data))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = hemoglobin ~ rate + method, data = data)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -3.454 -0.888  0.005  0.841  2.339 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)    6.801      0.312   21.83  < 2e-16 ***
+## rate2          2.760      0.394    7.00  9.2e-10 ***
+## rate3          2.405      0.394    6.10  4.2e-08 ***
+## rate4          1.880      0.394    4.77  8.9e-06 ***
+## methodB        0.348      0.279    1.25     0.22    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.25 on 75 degrees of freedom
+## Multiple R-squared:  0.444,  Adjusted R-squared:  0.414 
+## F-statistic:   15 on 4 and 75 DF,  p-value: 4.92e-09
+\end{verbatim}
+
+As we see from the previous point, \textbf{rate} has greater impact
+compared to method.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{hemoglobin[data}\SpecialCharTok{$}\NormalTok{rate}\SpecialCharTok{==}\DecValTok{3} \SpecialCharTok{\&}\NormalTok{ data}\SpecialCharTok{$}\NormalTok{method}\SpecialCharTok{==}\StringTok{\textquotesingle{}A\textquotesingle{}}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 9.03
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{which.max}\NormalTok{(}\FunctionTok{aggregate}\NormalTok{(hemoglobin }\SpecialCharTok{\textasciitilde{}}\NormalTok{ rate, }\AttributeTok{data=}\NormalTok{data, mean)}\SpecialCharTok{$}\NormalTok{hemoglobin)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2
+\end{verbatim}
+
+Rate \textbf{2} leads to highest hemoglobin levels, while mean level for
+rate 3 with method A is 9.03
+
+\textbf{d)}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(}\FunctionTok{lm}\NormalTok{(hemoglobin }\SpecialCharTok{\textasciitilde{}}\NormalTok{ rate, }\AttributeTok{data=}\NormalTok{data))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Response: hemoglobin
+##           Df Sum Sq Mean Sq F value  Pr(>F)    
+## rate       3   90.6   30.19    19.3 2.1e-09 ***
+## Residuals 76  118.9    1.56                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{hemoglobin[data}\SpecialCharTok{$}\NormalTok{rate}\SpecialCharTok{==}\DecValTok{1}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 6.97
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{hemoglobin[data}\SpecialCharTok{$}\NormalTok{rate}\SpecialCharTok{==}\DecValTok{2}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 9.73
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{hemoglobin[data}\SpecialCharTok{$}\NormalTok{rate}\SpecialCharTok{==}\DecValTok{3}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 9.38
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{hemoglobin[data}\SpecialCharTok{$}\NormalTok{rate}\SpecialCharTok{==}\DecValTok{4}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 8.86
+\end{verbatim}
+
+\textcolor{red}{Is it right/wrong or useful/not useful to perform this test on this dataset?}
+
+\textbf{e)}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{kruskal.test}\NormalTok{(hemoglobin }\SpecialCharTok{\textasciitilde{}}\NormalTok{ rate, }\AttributeTok{data=}\NormalTok{data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Kruskal-Wallis rank sum test
+## 
+## data:  hemoglobin by rate
+## Kruskal-Wallis chi-squared = 34, df = 3, p-value = 2e-07
+\end{verbatim}
+
+\textcolor{red}{Explain possible differences between the Kruskal-Wallis and ANOVA tests.}
+- Kruskal-Wallis is rank-based test while ANOVA is values (?) based.
+
+\hypertarget{exercise-3}{%
+\subsection{Exercise 3}\label{exercise-3}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# library(lme4)}
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{read.table}\NormalTok{(}\StringTok{"cream{-}1.txt"}\NormalTok{, }\AttributeTok{header=}\NormalTok{T)}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{batch }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{batch)}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{position }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{position)}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{starter }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{starter)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{a)}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{aciditylm }\OtherTok{=} \FunctionTok{lm}\NormalTok{(acidity }\SpecialCharTok{\textasciitilde{}}\NormalTok{ batch }\SpecialCharTok{+}\NormalTok{ position }\SpecialCharTok{+}\NormalTok{ starter, data)}
+\FunctionTok{anova}\NormalTok{(aciditylm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Response: acidity
+##           Df Sum Sq Mean Sq F value  Pr(>F)    
+## batch      4   18.8    4.69    8.60  0.0016 ** 
+## position   4    2.3    0.59    1.08  0.4112    
+## starter    4   44.1   11.03   20.21 2.9e-05 ***
+## Residuals 12    6.6    0.55                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(aciditylm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = acidity ~ batch + position + starter, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.2836 -0.2336  0.0384  0.3584  1.0204 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)    8.662      0.533   16.26  1.5e-09 ***
+## batch2        -1.348      0.467   -2.88    0.014 *  
+## batch3         0.276      0.467    0.59    0.566    
+## batch4         1.368      0.467    2.93    0.013 *  
+## batch5         0.200      0.467    0.43    0.676    
+## position2     -0.618      0.467   -1.32    0.211    
+## position3     -0.038      0.467   -0.08    0.937    
+## position4     -0.764      0.467   -1.63    0.128    
+## position5     -0.264      0.467   -0.56    0.583    
+## starter2      -0.150      0.467   -0.32    0.754    
+## starter3      -0.980      0.467   -2.10    0.058 .  
+## starter4       2.810      0.467    6.01  6.1e-05 ***
+## starter5      -0.484      0.467   -1.04    0.321    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.739 on 12 degrees of freedom
+## Multiple R-squared:  0.909,  Adjusted R-squared:  0.818 
+## F-statistic: 9.96 on 12 and 12 DF,  p-value: 0.000178
+\end{verbatim}
+
+We cannot say that there is a statistically significant difference in
+effects of starters 1 and 2 from this test.
+\textcolor{red}{Motivate your answer} - p-value is high? Is that enough?
+
+\textbf{b)}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{aciditylm }\OtherTok{=} \FunctionTok{lm}\NormalTok{(acidity }\SpecialCharTok{\textasciitilde{}}\NormalTok{ batch }\SpecialCharTok{+}\NormalTok{ starter, data)}
+\FunctionTok{anova}\NormalTok{(aciditylm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Response: acidity
+##           Df Sum Sq Mean Sq F value  Pr(>F)    
+## batch      4   18.8    4.69    8.44 0.00073 ***
+## starter    4   44.1   11.03   19.84 4.8e-06 ***
+## Residuals 16    8.9    0.56                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(aciditylm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = acidity ~ batch + starter, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.5648 -0.2548 -0.0548  0.3592  1.1352 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)    8.325      0.447   18.60  2.9e-12 ***
+## batch2        -1.348      0.472   -2.86    0.011 *  
+## batch3         0.276      0.472    0.59    0.567    
+## batch4         1.368      0.472    2.90    0.010 *  
+## batch5         0.200      0.472    0.42    0.677    
+## starter2      -0.150      0.472   -0.32    0.755    
+## starter3      -0.980      0.472   -2.08    0.054 .  
+## starter4       2.810      0.472    5.96  2.0e-05 ***
+## starter5      -0.484      0.472   -1.03    0.320    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.746 on 16 degrees of freedom
+## Multiple R-squared:  0.876,  Adjusted R-squared:  0.814 
+## F-statistic: 14.1 on 8 and 16 DF,  p-value: 6.47e-06
+\end{verbatim}
+
+Here we see that \textbf{starter 4} has the biggest effect on
+\textbf{acidity}. \textcolor{red}{Motivvate your answer} The test shows
+largest coefficient value for that starter as well as p-value is very
+close to zero.
+
+\textbf{c)}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{friedman.test}\NormalTok{(acidity }\SpecialCharTok{\textasciitilde{}}\NormalTok{ starter }\SpecialCharTok{|}\NormalTok{ batch, data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Friedman rank sum test
+## 
+## data:  acidity and starter and batch
+## Friedman chi-squared = 13, df = 4, p-value = 0.01
+\end{verbatim}
+
+Friedman test is applicable here, as it does not assume normality in
+data distribution, while 2-way ANOVA does.
+
+\textbf{d)}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(lme4)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Загрузка требуемого пакета: Matrix
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm1 }\OtherTok{=} \FunctionTok{lmer}\NormalTok{(acidity }\SpecialCharTok{\textasciitilde{}}\NormalTok{ starter }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{batch) }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{position), data)}
+\NormalTok{lm2 }\OtherTok{=} \FunctionTok{lmer}\NormalTok{(acidity }\SpecialCharTok{\textasciitilde{}}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{batch) }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{position), data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## boundary (singular) fit: see help('isSingular')
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(lm1, lm2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## refitting model(s) with ML (instead of REML)
+\end{verbatim}
+
+\begin{verbatim}
+## Data: data
+## Models:
+## lm2: acidity ~ (1 | batch) + (1 | position)
+## lm1: acidity ~ starter + (1 | batch) + (1 | position)
+##     npar   AIC   BIC logLik deviance Chisq Df Pr(>Chisq)    
+## lm2    4 105.1 109.9  -48.5     97.1                        
+## lm1    8  77.2  86.9  -30.6     61.2  35.9  4    3.1e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(lm1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Linear mixed model fit by REML ['lmerMod']
+## Formula: acidity ~ starter + (1 | batch) + (1 | position)
+##    Data: data
+## 
+## REML criterion at convergence: 61.6
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.1067 -0.4404 -0.0575  0.5405  1.5203 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  batch    (Intercept) 0.82964  0.9108  
+##  position (Intercept) 0.00819  0.0905  
+##  Residual             0.54602  0.7389  
+## Number of obs: 25, groups:  batch, 5; position, 5
+## 
+## Fixed effects:
+##             Estimate Std. Error t value
+## (Intercept)    8.424      0.526   16.01
+## starter2      -0.150      0.467   -0.32
+## starter3      -0.980      0.467   -2.10
+## starter4       2.810      0.467    6.01
+## starter5      -0.484      0.467   -1.04
+## 
+## Correlation of Fixed Effects:
+##          (Intr) strtr2 strtr3 strtr4
+## starter2 -0.444                     
+## starter3 -0.444  0.500              
+## starter4 -0.444  0.500  0.500       
+## starter5 -0.444  0.500  0.500  0.500
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(}\FunctionTok{fitted}\NormalTok{(lm1), }\FunctionTok{residuals}\NormalTok{(lm1))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ass1_files/figure-latex/unnamed-chunk-26-1.pdf}
+
+\textcolor{red}{Comment?} No structure in data can be seen?
+
+\end{document}

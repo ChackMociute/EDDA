@@ -1,6 +1,6 @@
 ---
 title: "Assignment 1"
-author: "Martynas Vaznonois, Andrei xxxxx, Carlo xxxxx (Group 1)"
+author: "Martynas Vaznonois, Andrei Puchkov, Carlo Peron (Group 1)"
 date: "23 February 2024"
 output: pdf_document
 highlight: tango
@@ -9,14 +9,13 @@ editor_options:
     wrap: 72
 ---
 
-`r options(digits=3)`
-`r options(warn=-1)`
+`r options(digits=3)` `r options(warn=-1)`
 `r data <- read.csv("Ice_cream-1.csv")`
-
 
 ## Exercise 1
 
-**a)** The histogram and the qq plot look fairly indicative of normality but the Shapiro-Wilk test provides evidence for the contrary.
+**a)** The histogram and the qq plot look fairly indicative of normality
+but the Shapiro-Wilk test provides evidence for the contrary.
 
 ```{r, fig.height=3, fig.width=6}
 par(mfrow=c(1, 2)); qqnorm(data$video)
@@ -24,7 +23,12 @@ hist(data$video, freq=T, main="Histogram of video", xlab="Video")
 shapiro.test(data$video)
 ```
 
-Assuming normality, especially with a sample size $n>30$, we use the z-score instead of the $t_{n-1}$-score to compute the 97% confidence interval. Rearranging the formula, we find the number of participants needed to make the CI at most 3. Finally, we compute the bootstrap CI by simulating sampling from the same distribution and calculating the mean test statistics.
+Assuming normality, especially with a sample size $n>30$, we use the
+z-score instead of the $t_{n-1}$-score to compute the 97% confidence
+interval. Rearranging the formula, we find the number of participants
+needed to make the CI at most 3. Finally, we compute the bootstrap CI by
+simulating sampling from the same distribution and calculating the mean
+test statistics.
 
 ```{r}
 # CI
@@ -43,29 +47,47 @@ for(i in 1:B)
 c(2*mean(Tstar) - quantile(Tstar, 1 - alpha/2), 2*mean(Tstar) - quantile(Tstar, alpha/2))
 ```
 
-**b)** The first test below shows that the $H_0$ is rejected ($p<0.001$). The confidence interval for the true mean is $(50.69; \infty)$. This shows that the true mean can be find within that interval with 95% certainty. Because the mean of 50 under $H_0$ is not in that interval, the probability of $H_0$ being true is less than 5%, leading ti its rejection. Under the second test, the $\mu_0$ is within that same interval, which is why the p-value is above 0.05 and why $H_0$ cannot be rejected.
+**b)** The first test below shows that the $H_0$ is rejected
+($p<0.001$). The confidence interval for the true mean is
+$(50.69; \infty)$. This shows that the true mean can be find within that
+interval with 95% certainty. Because the mean of 50 under $H_0$ is not
+in that interval, the probability of $H_0$ being true is less than 5%,
+leading ti its rejection. Under the second test, the $\mu_0$ is within
+that same interval, which is why the p-value is above 0.05 and why $H_0$
+cannot be rejected.
 
 ```{r}
 t.test(data$video, mu=50, alternative="greater")
 t.test(data$video, mu=51, alternative="greater")
 ```
 
-
-**c)** The first test below is the sign (binomial) test. It assumes $H_0: m=50$ to be the median and if the $H_0$ is correct, then there should be approximately the same number of observations to the right and left of it. The Wilcoxon test also considers ranks to make stronger predictions. Comparing to **b)**, the t-tests require the data to be normally distributed which is unclear in our case. The two latter tests do not make such an assumption which may make them more applicable. On the other hand, they throw away more information, and in the case of the sign test, so much information has been lost that $H_0$ cannot be rejected, like it was with the t-test. The Wilcoxon test only assumes symmetrical distribution, which seems likely. And it, like the t-test, provides enough evidence to reject $H_0$
+**c)** The first test below is the sign (binomial) test. It assumes
+$H_0: m=50$ to be the median and if the $H_0$ is correct, then there
+should be approximately the same number of observations to the right and
+left of it. The Wilcoxon test also considers ranks to make stronger
+predictions. Comparing to **b)**, the t-tests require the data to be
+normally distributed which is unclear in our case. The two latter tests
+do not make such an assumption which may make them more applicable. On
+the other hand, they throw away more information, and in the case of the
+sign test, so much information has been lost that $H_0$ cannot be
+rejected, like it was with the t-test. The Wilcoxon test only assumes
+symmetrical distribution, which seems likely. And it, like the t-test,
+provides enough evidence to reject $H_0$
 
 ```{r}
 binom.test(sum(data$video>50), length(data$video), alternative='g')
 wilcox.test(data$video, mu=50, alternative='g')
 ```
 
-Testing whether less than 25% of the data falls below 42 comes down to calculating the fraction of the data below 42 and checking if it is less than 0.25.
+Testing whether less than 25% of the data falls below 42 comes down to
+calculating the fraction of the data below 42 and checking if it is less
+than 0.25.
 
 ```{r}
 sum(data$video<42)/length(data$video) <= 0.25
 ```
 
-
-**d)** 
+**d)**
 
 ```{r}
 # Bootstrap test
@@ -80,16 +102,22 @@ for(m in 0:100){
     means = c(means, m)
 }
 range(means)
+```
 
-# Kolmogorov-Smirnov test
+Kolmogorov-Smirnov test, to roughly estimate the means which fit
+
+```{r}
 means = NULL
 for(m in 0:100){
   if(ks.test(data$video, pnorm, m, 10)[[2]] > 0.05)
     means = c(means, m)
 }
 range(means)
+```
 
-# More precise KS test
+More precise KS test
+
+```{r}
 means = NULL
 for(m in seq(51, 54, by=0.001)){
   if(ks.test(data$video, pnorm, m, 10)[[2]] > 0.05)
@@ -98,72 +126,181 @@ for(m in seq(51, 54, by=0.001)){
 range(means)
 ```
 
+**e)**
 
-**e)** 
-
-```{r}
-```
-
-
-**f)** 
+Here we create separate dataframes for male scores and female ones
 
 ```{r}
+fvideo = data$video[data$female == 1]
+mvideo = data$video[data$female == 0]
 ```
 
+Then we run 3 tests on the data to check if male scores are indeed
+higher than female.
+
+```{r}
+
+t.test(mvideo, fvideo, alternative='g')
+wilcox.test(mvideo, fvideo, alternative='g')
+ks.test(mvideo, fvideo, alternative='l')
+```
+
+Which means the expert was right.
+
+To answer about tests' applicability, we need to check the distribution
+of data. For t-test it needs to follow the \textcolor{red}{normal
+distribution}.
+
+```{r, fig.height=6, fig.width=6}
+par(mfrow=c(2, 2))
+qqnorm(fvideo); qqnorm(mvideo); hist(fvideo); hist(mvideo)
+shapiro.test(fvideo); shapiro.test(mvideo)
+```
+
+The test shows that the data is indeed normally distributed, although
+female video results are on the borderline.
+
+**f)** Here we apply Pearson correlation test along with Spearman test,
+which shows monotonic relationship between variables. Pearson shows just
+linear dependency in data.
+
+```{r}
+cor.test(data$video, data$puzzle)
+cor.test(data$video, data$puzzle, method='spearman')
+```
+
+We see that data is weakly correlated.
+
+Then we check the data for symmetricity and normality
+
+```{r, fig.height=6, fig.width=6}
+par(mfrow=c(2, 2))
+qqnorm(data$video); qqnorm(data$puzzle);
+hist(data$video); hist(data$puzzle)
+shapiro.test(data$video); shapiro.test(data$puzzle)
+```
 
 ## Exercise 2
 
-**a)** 
-
 ```{r}
+data <- read.table("hemoglobin-1.txt", header=T)
+data$rate <- as.factor(data$rate)
+data$method <- as.factor(data$method)
 ```
 
+**a)**
 
-**b)** 
-
-```{r}
+```{r, results = 'hide', include=FALSE}
+I=4; J=2; N=10
+data.frame(fish=sample(1:(N*I*J)), rate=rep(1:I, each=N*J), method=rep(1:J, N*I))
 ```
 
-
-**c)** 
-
-```{r}
-```
-
-
-**d)** 
+**b)**
 
 ```{r}
+anova(lm(hemoglobin~rate*method, data=data))
 ```
 
+Here we see that **method** does not have a significant impact on
+hemoglobin levels, while **rate** does.
+\textcolor{red}{comment on findings}
 
-**e)** 
+**c)**
 
 ```{r}
+anova(lm(hemoglobin~rate+method, data=data))
+summary(lm(hemoglobin~rate+method, data=data))
 ```
 
+As we see from the previous point, **rate** has greater impact compared
+to method.
+
+```{r}
+mean(data$hemoglobin[data$rate==3 & data$method=='A'])
+which.max(aggregate(hemoglobin ~ rate, data=data, mean)$hemoglobin)
+```
+
+Rate **2** leads to highest hemoglobin levels, while mean level for rate
+3 with method A is 9.03
+
+**d)**
+
+```{r}
+anova(lm(hemoglobin ~ rate, data=data))
+```
+
+```{r}
+mean(data$hemoglobin[data$rate==1])
+mean(data$hemoglobin[data$rate==2])
+mean(data$hemoglobin[data$rate==3])
+mean(data$hemoglobin[data$rate==4])
+```
+
+\textcolor{red}{Is it right/wrong or useful/not useful to perform this test on this dataset?}
+
+**e)**
+
+```{r}
+kruskal.test(hemoglobin ~ rate, data=data)
+```
+
+\textcolor{red}{Explain possible differences between the Kruskal-Wallis and ANOVA tests.} -
+Kruskal-Wallis is rank-based test while ANOVA is values (?) based.
 
 ## Exercise 3
 
-**a)** 
-
 ```{r}
+# library(lme4)
+data <- read.table("cream-1.txt", header=T)
+data$batch <- as.factor(data$batch)
+data$position <- as.factor(data$position)
+data$starter <- as.factor(data$starter)
 ```
 
-
-**b)** 
-
-```{r}
-```
-
-
-**c)** 
+**a)**
 
 ```{r}
+aciditylm = lm(acidity ~ batch + position + starter, data)
+anova(aciditylm)
+summary(aciditylm)
 ```
 
+We cannot say that there is a statistically significant difference in
+effects of starters 1 and 2 from this test.
+\textcolor{red}{Motivate your answer} - p-value is high? Is that enough?
 
-**d)** 
+**b)**
 
 ```{r}
+aciditylm = lm(acidity ~ batch + starter, data)
+anova(aciditylm)
+summary(aciditylm)
 ```
+
+Here we see that **starter 4** has the biggest effect on **acidity**.
+\textcolor{red}{Motivvate your answer} The test shows largest
+coefficient value for that starter as well as p-value is very close to
+zero.
+
+**c)**
+
+```{r}
+friedman.test(acidity ~ starter | batch, data)
+```
+
+Friedman test is applicable here, as it does not assume normality in
+data distribution, while 2-way ANOVA does.
+
+**d)**
+
+```{r}
+library(lme4)
+lm1 = lmer(acidity ~ starter + (1|batch) + (1|position), data)
+lm2 = lmer(acidity ~ (1|batch) + (1|position), data)
+anova(lm1, lm2)
+summary(lm1)
+par(mfrow=c(1,1))
+plot(fitted(lm1), residuals(lm1))
+```
+
+\textcolor{red}{Comment?} No structure in data can be seen?
