@@ -20,8 +20,13 @@ which.max(aggregate(hemoglobin ~ rate, data=data, mean)$hemoglobin)
 
 
 # d)
-anova(lm(hemoglobin ~ rate, data=data))
+hemoaov = lm(hemoglobin ~ rate, data=data)
+anova(hemoaov)
 
 
 # e)
 kruskal.test(hemoglobin ~ rate, data=data)
+
+par(mfrow=c(1, 1)); plot(fitted(hemoaov), residuals(hemoaov))
+
+    
