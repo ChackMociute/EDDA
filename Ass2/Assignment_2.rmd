@@ -1,0 +1,416 @@
+---
+title: "assignment 2"
+author: "Andrei Puchkov, Carlo Peron, Martynas Vaznonois"
+date: "2024-03-03"
+output: pdf_document
+fontsize: 11pt
+highlight: tango
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercice 1
+
+**a)**
+
+```{r}
+df <- read.table('fruitflies.txt', header = TRUE)
+```
+
+The dataframe shoes the thorax length, the longivity and the activity
+level of each fruitfly. We're now going to add the log-longevity to this
+table.
+
+```{r}
+df$loglongevity <- log(df$longevity)
+```
+
+Now we observe some visualizations to help understand the relationship
+between the variables.
+
+```{r, fig.height=3, fig.width=3}
+library(ggplot2)
+ggplot(df, aes(x = activity, y = loglongevity)) +
+  geom_boxplot() +
+  labs(title = 'Effect of Sexual Activity on Longevity')
+```
+
+```{r, fig.height=3, fig.width=4}
+ggplot(df, aes(x = thorax, y = longevity, color = activity)) +
+  geom_point() +
+  labs(title = 'Longevity vs Thorax with Color Coding of Activity')
+```
+
+```{r}
+anova_result <- aov(longevity ~ activity, data = df)
+summary(anova_result)
+```
+
+Looking at the results of the anova test it is possible to conclude that
+there is significant difference between the longevity of different
+groups taken into account their activity level.
+
+```{r}
+estimated_longevity <- tapply(df$longevity, df$activity, mean)
+print(estimated_longevity)
+```
+
+The estimated longevity is calculated by taking the sample mean of each longevity group. 
+
+**b)**
+```{r}
+ancova_model <- lm(longevity ~ activity + thorax, data = df)
+summary(ancova_model)
+```
+The positive coefficient for **thorax** suggests that flies with longer thorax lengths tend to have higher estimated longevities. The same can be said for the other activity levels of the animals. 
+```{r}
+average_thorax <- mean(df$thorax)
+
+predictions <- data.frame(activity = unique(df$activity), thorax = average_thorax)
+
+predicted_longevity <- predict(ancova_model, newdata = predictions)
+print(predicted_longevity)
+```
+The result shows varying in longevity given the average thorax for different activity groups.
+
+**c)**
+```{r, fig.height=3, fig.width=4}
+ggplot(df, aes(x = activity, y = thorax, fill = activity)) +
+    geom_boxplot() +
+    labs(title = 'Boxplot of Thorax Length by Activity',
+         x = 'Activity',
+         y = 'Thorax Length') +
+    theme_minimal() +
+    scale_fill_brewer(palette = "Blues") 
+
+```
+```{r, fig.height=3, fig.width=4}
+ggplot(df, aes(x = thorax, y = longevity, color = activity)) +
+  geom_point() +
+  facet_wrap(~activity) +
+  labs(title = 'Scatter Plot of Longevity vs Thorax, Faceted by Activity',
+       x = 'Thorax Length',
+       y = 'Longevity') +
+  theme_minimal()
+```
+```{r, fig.height=3, fig.width=4}
+ggplot(df, aes(x = thorax, y = longevity, color = activity)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, linetype = "dashed", aes(group = 1)) +
+  labs(title = 'Interaction Plot of Longevity vs Thorax by Activity',
+       x = 'Thorax Length',
+       y = 'Longevity') +
+  theme_minimal()
+```
+```{r}
+interaction_model <- lm(longevity ~ thorax * activity, data = df)
+
+interaction_anova <- anova(interaction_model)
+print(interaction_anova)
+```
+Given a p value of 0.9435 it is likely that there is no significant interaction effect between thorax length and activity level in predicting longevity.
+
+**d)**
+First we're gonna look at correlation between thorax and longevity. 
+```{r}
+overall_corr <- cor(df$thorax, df$longevity)
+
+cat("Overall Correlation:", overall_corr)
+
+```
+Secondly we fit a linear model that includes an interaction term between length and activity group. A significant p-value indicates that the influence of thorax length on longevity differs across the treatment groups.
+```{r}
+model <- lm(loglongevity ~ activity * thorax, data = df) 
+summary(model)
+```
+We believe that due to its explanatory power the thorax variable should be kept for the analysis. 
+
+**e)**
+```{r, fig.height=6, fig.width=6}
+par(mfrow = c(2, 2))
+ancova_model_days <- lm(longevity ~ activity + thorax, data = df)
+summary(ancova_model_days)
+plot(ancova_model_days)
+```
+
+
+```{r, fig.height=6, fig.width=6}
+par(mfrow = c(2, 2))
+ancova_model_log <- lm(loglongevity ~ activity + thorax, data = df)
+summary(ancova_model_log)
+plot(ancova_model_log)
+```
+
+It is best to use the log of a variable given:
+<dl>
+<dt>Unequal variance: When the data shows uneven spread (heteroscedasticity) across different values of the predictor variables (like activity group), using the log can help stabilize the variance and make the analysis more reliable.</dt>
+
+<dt>Non-normal residuals: If the leftovers (residuals) from the model don't follow a regular bell-shaped curve (normal distribution), using the log can sometimes make them more normal, which is a common assumption for many statistical models.</dt>
+</dl>
+Which model to choose? From the plots above it doesn't seem that the non-log version has worse variance or non normal residuals, it is therefore possible to use the non-log version without risks.
+
+## Exercise 2
+
+```{r}
+df <- read.csv("BirthWeight.csv")
+```
+
+**a)**
+To analyse the problem of influence points we're going to use Cook's distance. This method spots the influence points in the dataset. 
+
+```{r}
+lm_model <- lm(Birthweight ~ ., data = df)
+
+cooks_distance_values <- cooks.distance(lm_model)
+cooks_dist_values <- as.data.frame(cooks_distance_values)
+
+print(cooks_dist_values)
+```
+
+To check collinearity we can instead use VIF.
+```{r, results = 'hide', include=FALSE}
+install.packages("car")
+library(car)
+```
+
+```{r}
+vif(lm_model)
+```
+
+**b)**
+```{r}
+summary(lm_model)
+```
+
+The first variable to remove is lowbwt followed by mheight, fedyrs, mnocig and so on. It seems that there are many variables with significance value higher than 0.05, we're going to use a function to determine the \textcolor{red}{significant variables}
+
+```{r}
+backward_elimination <- function(model) {
+  while (length(coef(model)) > 1) {
+    summary_model <- summary(model)
+    max_p_value <- max(summary_model$coefficients[, "Pr(>|t|)"])
+    
+    if (max_p_value > 0.05) {
+      max_p_variable <- rownames(summary_model$coefficients)[which(summary_model$coefficients[, "Pr(>|t|)"] == max_p_value)]
+      model_formula <- as.formula(paste(". ~ . -", max_p_variable))
+      model <- update(model, formula = model_formula)
+    } else {
+      break
+    }
+  }
+  return(model)
+}
+
+# Example usage
+reduced_model <- backward_elimination(lm_model)
+reduced_model
+```
+
+**c)**
+First we're finding the average value for the predictor variables, then we are predicting the values for the average predictors and extracting confidence intervals. In the second stage we instead calculate prediction values with intervals, and finally their intervals.
+```{r}
+average_values <- data.frame(
+  Headcirc = mean(df$Headcirc),
+  Gestation = mean(df$Gestation)
+)
+
+predicted_values <- predict(reduced_model, newdata = average_values, interval = "confidence", level = 0.95)
+
+confidence_intervals <- predicted_values[, c("fit", "lwr", "upr")]
+
+predicted_values_with_intervals <- predict(reduced_model, newdata = average_values, interval = "prediction", level = 0.95)
+
+prediction_intervals <- predicted_values_with_intervals[, c("fit", "lwr", "upr")]
+
+print("confidance intervals")
+print(confidence_intervals)
+print("prediction intervals")
+print(prediction_intervals)
+```
+
+**d)**
+
+```{r, results='hide', include=FALSE}
+install.packages("glmnet")
+install.packages("caret")
+
+library(glmnet)
+library(caret)
+```
+
+```{r}
+column_to_exclude <- "Birthweight"  
+columns_to_include <- setdiff(names(df), column_to_exclude)
+
+x <- as.matrix(df[, columns_to_include])
+y <- df$Birthweight
+
+lasso_model <- cv.glmnet(x, y, alpha = 1)
+
+coefficients_lm <- coef(reduced_model)
+coefficients_lasso <- as.matrix(coef(lasso_model, s = "lambda.min"))
+
+print("Linear Regression Coefficients:")
+print(coefficients_lm)
+
+print("LASSO Coefficients:")
+print(coefficients_lasso)
+```
+```{r}
+lm_predictions <- predict(reduced_model, newdata = df)
+lasso_predictions <- predict(lasso_model, newx = x, s = "lambda.min")
+
+rmse_lm <- sqrt(mean((lm_predictions - y)^2))
+rmse_lasso <- sqrt(mean((lasso_predictions - y)^2))
+
+print(paste("RMSE - Linear Regression: ", rmse_lm))
+print(paste("RMSE - LASSO: ", rmse_lasso))
+```
+Here the Lasso model seems to outperform the model handcrafted in the previous steps.
+
+**e)**
+```{r}
+summary_bwt_smoker <- tapply(df$Birthweight, df$smoker, summary)
+print(summary_bwt_smoker)
+```
+As it shows non-smokers give birth to children with bigger weight at birth.
+```{r}
+summary_bwt_age <- tapply(df$Birthweight, df$mage, summary)
+print(summary_bwt_age)
+```
+```{r, fig.height=5, fig.width=6}
+plot(df$mage, df$Birthweight, main = "Maternal Age vs. Birthweight", xlab = "Maternal Age", ylab = "Birthweight")
+
+correlation_age_bwt <- cor(df$mage, df$Birthweight)
+print(paste("Correlation between Age and Birthweight:", round(correlation_age_bwt, 3)))
+```
+
+It seems that there is no correlation between the maternal age and the birthweight. 
+
+```{r, fig.height=5, fig.width=6}
+boxplot(Birthweight ~ smoker, data = df, main = "Birthweight by Smoking Status", xlab = "Smoker (0: No, 1: Yes)", ylab = "Birthweight")
+```
+
+**f)**
+Here we encode the low birthweigth as a binary variable that is 1 when the weight is below 2.5 and is 0 when the weight is greater. This is the only way to fit a logistic regression to the otherwise continuous Birthweigth variable. 
+
+```{r}
+logistic_model <- glm(lowbwt ~ ., data = df, family = "binomial")
+summary(logistic_model)
+```
+```{r}
+odds_ratios <- exp(coef(logistic_model))
+odds_ratios
+```
+
+**g)**
+```{r, results='hide', include=FALSE}
+install.packages("jtools")
+install.packages("sjPlot")
+
+library(jtools)
+library(sjPlot)
+```
+
+```{r}
+lm_model_interaction_smoker <- lm(Birthweight ~ Gestation * smoker + smoker, data = df)
+summ(lm_model_interaction_smoker)
+```
+```{r, fig.height=5, fig.width=6}
+interaction.plot(x.factor = df$Gestation, trace.factor = df$smoker, response = df$Birthweight)
+```
+```{r, fig.height=5, fig.width=6}
+lm_model_interaction_mage35 <- lm(Birthweight ~ Gestation * mage35 + mage35, data = df)
+
+summ(lm_model_interaction_mage35)
+```
+```{r, fig.height=5, fig.width=6}
+interaction.plot(x.factor = df$Gestation, trace.factor = df$mage35, response = df$Birthweight)
+```
+
+Here we choose lm_model_interaction_smoker because it has a higher $R^2$ value. 
+
+**h)**
+```{r}
+new_data <- expand.grid(Gestation = 40, smoker = c(0, 1), mage35 = c(0, 1))
+
+predicted_birthweights <- predict(lm_model_interaction_smoker, newdata = new_data, type = "response")
+result <- cbind(new_data, Predicted_Birthweight = predicted_birthweights)
+print(result)
+```
+
+The results are not in the range 0 to 1 which makes us consider the fact that errors were made in the process of finding the probabilities.
+
+**i)**
+
+```{r}
+contingency_table <- table(df$smoker, df$mage35)
+chi_squared_result <- chisq.test(contingency_table)
+
+print(chi_squared_result)
+```
+
+<dl>
+<dt>**Simplicity**: Contingency table tests are relatively simple to implement</dt>
+<dt>**Limited Modeling**: Contingency table tests provide information about associations between variables but do not directly model the relationship</dt>
+
+<dt>**Assumes Independence**: The Chi-squared test assumes independence between the variables, \textcolor{red}{so what?</dt>
+
+<dt>**Modeling Complexity**: Logistic regression allows for the modeling of complex relationships</dt>
+
+<dt>**Assumption of Linearity**: Logistic regression assumes a linear relationship between the log odds and predictors</dt>
+
+<dt>**Sensitivity to Outliers**: Logistic regression can be sensitive to outliers</dt>
+</dl>
+
+## Exercise 3
+```{r}
+df <- read.table("awards.txt", header = TRUE)
+```
+
+**a)**
+
+```{r}
+poisson_model <- glm(num_awards ~ prog, data = df, family = "poisson")
+
+summ(poisson_model)
+
+predicted_awards <- predict(poisson_model, type = "response")
+
+result <- data.frame(Program_Type = unique(df$prog), Predicted_Awards = predicted_awards[1:3])
+
+print(result)
+```
+
+**b)**
+
+The Kruskal-Wallis test is a non-parametric test used to determine whether there are statistically significant differences between two or more independent groups. If we want to explore differences in the number of awards among different program types without assuming a specific distribution, we can use the Kruskal-Wallis test.
+
+```{r}
+kruskal_test_result <- kruskal.test(num_awards ~ prog, data = df)
+print(kruskal_test_result)
+```
+
+Given that the p-value is below the significance value of 0.05 we can conclude that there are differences in the number of awards among the different program types. 
+
+**c)**
+
+```{r}
+poisson_model <- glm(num_awards ~ prog * math, data = df, family = "poisson")
+
+summ(poisson_model)
+```
+
+```{r}
+new_data <- expand.grid(prog = unique(df$prog), math = 56)
+predicted_awards <- predict(poisson_model, newdata = df, type = "response")
+
+result <- cbind(df, Predicted_Awards = predicted_awards)
+print(result)
+```
+
