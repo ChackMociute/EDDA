@@ -91,3 +91,6 @@ cor.test(data$video, data$puzzle, method='spearman')
 qqnorm(data$video); qqnorm(data$puzzle)
 hist(data$video); hist(data$puzzle)
 shapiro.test(data$video); shapiro.test(data$puzzle)
+
+t.test(data$puzzle, data$video, paired=T, alternative='g')
+wilcox.test(data$puzzle, data$video, paired=T, alternative='g')

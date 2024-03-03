@@ -49,10 +49,10 @@ c(2*mean(Tstar) - quantile(Tstar, 1 - alpha/2), 2*mean(Tstar) - quantile(Tstar, 
 
 **b)** The first test below shows that the $H_0$ is rejected
 ($p<0.001$). The confidence interval for the true mean is
-$(50.69; \infty)$. This shows that the true mean can be find within that
+$(50.69; \infty)$. This shows that the true mean can be found within that
 interval with 95% certainty. Because the mean of 50 under $H_0$ is not
 in that interval, the probability of $H_0$ being true is less than 5%,
-leading ti its rejection. Under the second test, the $\mu_0$ is within
+leading to its rejection. Under the second test, the $\mu_0$ is within
 that same interval, which is why the p-value is above 0.05 and why $H_0$
 cannot be rejected.
 
@@ -87,14 +87,11 @@ than 0.25.
 sum(data$video<42)/length(data$video) <= 0.25
 ```
 
-**d)**
+**d)** The bootstrap test allows us to check if a particular sample is expected from some distribution. By calculating some statistic $T$ from many samples of some distribution $F$, we can estimate the likelihood of that statistic appearing in the distribution. Then, if that statistic of our sample $T(X_1,...,X_N)$ is unexpected compared to the simulated statistics, we can conclude that our sample did not come from distribution $F$. This can been seen in the code below which tests 101 normal distributions with different means to test which ones were plausible to yield our sample.
 
 ```{r}
 # Bootstrap test
-B = 10000
-t = min(data$video)
-Tstar = numeric(B)
-means = NULL
+B = 10000; t = min(data$video); Tstar = numeric(B); means = NULL
 for(m in 0:100){
   for(i in 1:B)
     Tstar[i] = min(rnorm(length(data$video), mean=m, sd=10))
@@ -104,9 +101,10 @@ for(m in 0:100){
 range(means)
 ```
 
-Kolmogorov-Smirnov test, to roughly estimate the means which fit
+The Kolmogorov-Smirnov test can show whether two distributions are the same. It can estimate the distribution of our sample by computing the empirical distribution function and compare it to some distribution $F$. Therefore it is also applicable in this situation. We run it once to test the integer values of possible Gaussians for our data and then again to get a more accurate range.
 
 ```{r}
+# Kolmogorov-Smirnov test, to roughly estimate the means which fit
 means = NULL
 for(m in 0:100){
   if(ks.test(data$video, pnorm, m, 10)[[2]] > 0.05)
@@ -115,9 +113,8 @@ for(m in 0:100){
 range(means)
 ```
 
-More precise KS test
-
 ```{r}
+# More precise KS test
 means = NULL
 for(m in seq(51, 54, by=0.001)){
   if(ks.test(data$video, pnorm, m, 10)[[2]] > 0.05)
@@ -126,181 +123,141 @@ for(m in seq(51, 54, by=0.001)){
 range(means)
 ```
 
-**e)**
-
-Here we create separate dataframes for male scores and female ones
+**e)** Here we create separate vectors for male scores and female ones. Then we run the 3 tests on the data to check if male scores are indeed higher than female. All tests provide support for the expert's claim.
 
 ```{r}
-fvideo = data$video[data$female == 1]
-mvideo = data$video[data$female == 0]
-```
-
-Then we run 3 tests on the data to check if male scores are indeed
-higher than female.
-
-```{r}
+fvideo = data$video[data$female == 1]; mvideo = data$video[data$female == 0]
 
 t.test(mvideo, fvideo, alternative='g')
 wilcox.test(mvideo, fvideo, alternative='g')
 ks.test(mvideo, fvideo, alternative='l')
 ```
 
-Which means the expert was right.
-
-To answer about tests' applicability, we need to check the distribution
-of data. For t-test it needs to follow the \textcolor{red}{normal
-distribution}.
+To confirm the tests' applicability, we need to check the distribution of data. For t-tests, it needs to follow a normal distribution. The histograms and qq plots, as well as the Shapiro-Wilk tests, likely confirm this. We do not show it here, but the boxplots also indicate normality. Therefore, the t-test is applicable. The Wilcoxon rank sum test only assumes symmetry which also seems likely. The Kolmogorov-Smirnov test does not assume a particular distribution and so is also applicable. The permutation test on the other hand is not applicable because these are independent samples.
 
 ```{r, fig.height=6, fig.width=6}
-par(mfrow=c(2, 2))
-qqnorm(fvideo); qqnorm(mvideo); hist(fvideo); hist(mvideo)
+par(mfrow=c(2, 2)); qqnorm(fvideo); qqnorm(mvideo); hist(fvideo); hist(mvideo)
 shapiro.test(fvideo); shapiro.test(mvideo)
 ```
 
-The test shows that the data is indeed normally distributed, although
-female video results are on the borderline.
-
-**f)** Here we apply Pearson correlation test along with Spearman test,
-which shows monotonic relationship between variables. Pearson shows just
-linear dependency in data.
+**f)** Here we first apply Pearson's correlation test which rejects $H_0: r=0$. This test assumes normality so we tested for it as in **e)**, and found that the data is not normal. Then we ran the Spearman's correlation test,
+which does not assume normality and found that the correlation was still there, meaning that $H_0: r=0$ can be rejected.
 
 ```{r}
 cor.test(data$video, data$puzzle)
 cor.test(data$video, data$puzzle, method='spearman')
 ```
 
-We see that data is weakly correlated.
+To test the hypothesis that the score on puzzles is higher than on video games, we ran a paired t-test. this found no difference. Unfortunately, `data$puzzle - data$video` is not normally distributed so a different test is needed. We then tried the Wilcoxon paired test, but it similarly did not find a significant difference.
 
-Then we check the data for symmetricity and normality
-
-```{r, fig.height=6, fig.width=6}
-par(mfrow=c(2, 2))
-qqnorm(data$video); qqnorm(data$puzzle);
-hist(data$video); hist(data$puzzle)
-shapiro.test(data$video); shapiro.test(data$puzzle)
+```{r}
+t.test(data$puzzle, data$video, paired=T, alternative='g')
+wilcox.test(data$puzzle, data$video, paired=T, alternative='g')
 ```
 
 ## Exercise 2
 
-```{r}
+```{r, include=FALSE}
 data <- read.table("hemoglobin-1.txt", header=T)
 data$rate <- as.factor(data$rate)
 data$method <- as.factor(data$method)
 ```
 
-**a)**
+**a)** We create a factorial design and distribute $N$ random fishes to each combination of the factors.
 
-```{r, results = 'hide', include=FALSE}
+```{r, results = 'hide'}
 I=4; J=2; N=10
 data.frame(fish=sample(1:(N*I*J)), rate=rep(1:I, each=N*J), method=rep(1:J, N*I))
 ```
 
-**b)**
+
+**b)** Here we first see that there is no interaction between the two factors. Next, we see that **method** does not have a significant impact on hemoglobin levels at all, while **rate** does.
 
 ```{r}
 anova(lm(hemoglobin~rate*method, data=data))
 ```
 
-Here we see that **method** does not have a significant impact on
-hemoglobin levels, while **rate** does.
-\textcolor{red}{comment on findings}
 
-**c)**
+**c)** This is not a particularly good question with the previous ANOVA test because it is unclear how a factor may influence the dependent variable through the interaction. Once we remove the interaction and consider only the additive model, we see that indeed **rate** has the greater impact and that **method** is not significant at all. Rate 2 leads to the significantly highest hemoglobin levels. Method B may be a little larger than method A but this cannot be ascertained with adequate statistical power. Therefore the highest mean hemoglobin combination is with rate 2 and probably method B.
 
 ```{r}
 anova(lm(hemoglobin~rate+method, data=data))
 summary(lm(hemoglobin~rate+method, data=data))
 ```
 
-As we see from the previous point, **rate** has greater impact compared
-to method.
+Below can be seen the mean hemoglobin when using rate 3 and method A. Also, as seen before, rate 2 leads to the highest hemoglobin values.
 
 ```{r}
 mean(data$hemoglobin[data$rate==3 & data$method=='A'])
 which.max(aggregate(hemoglobin ~ rate, data=data, mean)$hemoglobin)
 ```
 
-Rate **2** leads to highest hemoglobin levels, while mean level for rate
-3 with method A is 9.03
 
-**d)**
+**d)** The one-way ANOVA test shows that there is a difference in some means among the **rate** factor levels. In this dataset and after our initial analysis, we suspect that **method** does not influence the hemoglobin. Therefore, a block design is not warranted, and the one-way ANOVA is no more wrong or less useful than the two-way ANOVA.
 
 ```{r}
-anova(lm(hemoglobin ~ rate, data=data))
+hemoaov = lm(hemoglobin ~ rate, data=data); anova(hemoaov)
+
+# Point estimates for hemoglobin values for each rate
+aggregate(hemoglobin ~ rate, data=data, mean)
 ```
 
-```{r}
-mean(data$hemoglobin[data$rate==1])
-mean(data$hemoglobin[data$rate==2])
-mean(data$hemoglobin[data$rate==3])
-mean(data$hemoglobin[data$rate==4])
-```
 
-\textcolor{red}{Is it right/wrong or useful/not useful to perform this test on this dataset?}
-
-**e)**
+**e)** ANOVA makes several assumptions while the Kruskal-Wallis is the generalization of the Wilcoxon test. ANOVA assumes normally distributed data, equal variance for all levels of all factors and their combinations, and that the residuals follow a normal distribution. With the small sample size, it is hard to know whether these conditions are met. On the other hand, the non-parametric Kruskal-Wallis test can be employed regardless. In our case, it similarly rejects $H_0$.
 
 ```{r}
 kruskal.test(hemoglobin ~ rate, data=data)
 ```
 
-\textcolor{red}{Explain possible differences between the Kruskal-Wallis and ANOVA tests.} -
-Kruskal-Wallis is rank-based test while ANOVA is values (?) based.
+However, there are several things we can do to check if using ANOVA is appropriate before the need for the Kruskal-Wallis test. The first is to check if the variance is identical. It us unclear if the variance is identical here. We can also check the residuals. Plotting the residuals against the fitted parameters should yield no structure. In our case ANOVA is probably fine but if we need to be completely certain, the Kruskal-Wallis may be preferable.
+
+```{r}
+# Checking the variance
+aggregate(hemoglobin ~ rate:method, data=data, sd)
+
+# Checking the residuals
+par(mfrow=c(1, 1)); plot(fitted(hemoaov), residuals(hemoaov))
+```
+
 
 ## Exercise 3
 
-```{r}
-# library(lme4)
+```{r, include=FALSE}
+library(lme4)
 data <- read.table("cream-1.txt", header=T)
 data$batch <- as.factor(data$batch)
 data$position <- as.factor(data$position)
 data$starter <- as.factor(data$starter)
 ```
 
-**a)**
+**a)** We ran an additive ANOVA model and found that the **starter** indeed have a strong effect on the **acidity**. Out of the two blocks, the **position** had no effect but the **batch** did.
+
+The following summary shows that there is no statistically significant difference in effects of starters 1 and 2. The only starter that seems to deviate from the rest and yield significantly higher acidity is starter 4.
 
 ```{r}
-aciditylm = lm(acidity ~ batch + position + starter, data)
-anova(aciditylm)
+aciditylm = lm(acidity ~ batch + position + starter, data); summary(aciditylm)
+```
+
+
+**b)** Since position had no effect on acidity, we removed it. Our findings remain identical as in **a)**. Here we see that starter 4 has the biggest effect on **acidity**. From the summary, we can see that $\alpha_4$ is the only one that is positive, and the only one that differs significantly from $\alpha_1$. This shows not only that starter 4 has the strongest positive effect on the acidity of the sour cream, but also that the reference starter, starter 1, has the second strongest, though insignificantly different from the rest of the lower acidity starters.
+
+```{r}
+aciditylm = lm(acidity ~ starter + batch, data); anova(aciditylm)
 summary(aciditylm)
 ```
 
-We cannot say that there is a statistically significant difference in
-effects of starters 1 and 2 from this test.
-\textcolor{red}{Motivate your answer} - p-value is high? Is that enough?
-
-**b)**
-
-```{r}
-aciditylm = lm(acidity ~ batch + starter, data)
-anova(aciditylm)
-summary(aciditylm)
-```
-
-Here we see that **starter 4** has the biggest effect on **acidity**.
-\textcolor{red}{Motivvate your answer} The test shows largest
-coefficient value for that starter as well as p-value is very close to
-zero.
-
-**c)**
+**c)** Friedman test is also applicable here, as it is similar to 2-way ANOVA but does not assume normality in
+the data distribution. Therefore, it can be seen like a non-parametric counterpart to 2-way ANOVA. Here it leads to the same result that the starter does indeed have an effect on the acidity.
 
 ```{r}
 friedman.test(acidity ~ starter | batch, data)
 ```
 
-Friedman test is applicable here, as it does not assume normality in
-data distribution, while 2-way ANOVA does.
-
-**d)**
+**d)** We fitted two linear mixed effects models on our data. One with the **starter** factor as a fixed effect and one without it. Then we ran an ANOVA to see if the 2 models were different, and indeed they were, as the previous experiments would have suggested. Looking into `summary(lm1)` (not shown here), we found identical alphas for the starter, but we also saw how much variance the random effect factors explained. Finally we plotted the residuals of the fitted model to ensure that ANOVA was appropriate here.
 
 ```{r}
-library(lme4)
 lm1 = lmer(acidity ~ starter + (1|batch) + (1|position), data)
 lm2 = lmer(acidity ~ (1|batch) + (1|position), data)
 anova(lm1, lm2)
-summary(lm1)
-par(mfrow=c(1,1))
 plot(fitted(lm1), residuals(lm1))
 ```
-
-\textcolor{red}{Comment?} No structure in data can be seen?
