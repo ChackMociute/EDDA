@@ -1,0 +1,142 @@
+---
+title: "Assignment 2"
+author: "Martynas Vaznonis, Andrei Puchkov, Carlo Peron"
+date: "2024-03-08"
+output: pdf_document
+fontsize: 11pt
+highlight: tango
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+
+```{r setup, include=FALSE}
+library(ggplot2)
+data <- read.table('fruitflies.txt', header = TRUE)
+data$loglongevity <- log(data$longevity)
+```
+
+## Exercice 1
+
+
+**a)** After loading in the data and adding a column for the log of longevity we create the plots seen below. From the plot it seems like there may be a difference among the different levels of activity but it is not perfectly clear. On the other hand, a correlation between the log of longevity and thorax length is already likely from the plot. To clarify if sexual activity had an effect on the longevity, we ran a 1-way ANOVA test. The test showed that there is indeed a significant difference in the longevity of a fruit fly based on its sexual activity.
+
+```{r, fig.height=4, fig.width=10}
+gridExtra::grid.arrange(
+ggplot(data, aes(x = activity, y = loglongevity)) + geom_boxplot() +
+  labs(title = 'Sexual Activity vs Longevity'),
+ggplot(data, aes(x = thorax, y = loglongevity, color = activity)) + geom_point() +
+  labs(title = 'Longevity vs Thorax'), ncol=2)
+```
+
+```{r}
+activityaov = lm(loglongevity ~ activity, data=data)
+anova(activityaov)
+```
+
+Finally, we check what the mean log of longevity is per level of sexual activity and found that the virgin flies live longer. In other words, it seems that the more poontang a fly gets, the faster it dies.
+
+```{r}
+tapply(data$loglongevity, data$activity, mean)
+```
+
+
+**b)** The positive coefficient for thorax suggests that flies with longer thorax lengths tend to have a higher estimated longevity. The predicted results show variance in longevity given the average thorax for different activity levels. The highest expected longevity is seen in the isolated case while the lowest in the high case. Thus, under this model too, the longevity decreases with sexual activity.
+
+```{r}
+loglongaov = lm(loglongevity ~ thorax + activity, data=data); summary(loglongaov)
+
+average_thorax <- mean(data$thorax)
+predictions <- data.frame(activity=unique(data$activity), thorax=average_thorax)
+rbind(predictions$activity, round(predict(loglongaov, newdata=predictions), 3))
+```
+
+
+**c)** It is clear to see that the longevity is correlated with the thorax length from the plots below. Whether there is any difference in the influence of thorax among the levels of activity is not as clear. To test this, we run an ANOVA test with interaction between thorax length and sexual activity. If they interact, that means that the effect of thorax length is not the same across the groups of activity. Because we do not observe a significant contribution of the interaction term, we conclude that thorax length affects the longevity of all fruit flies the same.
+
+```{r, echo=FALSE, results='hide', warning=FALSE, fig.height=4, fig.width=10}
+gridExtra::grid.arrange(
+  ggplot(data, aes(x = thorax, y = loglongevity, color = activity)) +
+    geom_point() +
+    facet_wrap(~activity) +
+    labs(title = 'Longevity vs Thorax, faceted by Activity',
+         x = 'Thorax Length',
+         y = 'Log longevity') +
+    theme_minimal(),
+  ggplot(data, aes(x = thorax, y = loglongevity, color = activity)) +
+    geom_point() +
+    geom_smooth(formula = y ~ x, method = "lm", se = FALSE, linetype = "dashed", aes(group = 1)) +
+    labs(title = 'Longevity vs Thorax',
+         x = 'Thorax Length',
+         y = 'Log longevity') +
+    theme_minimal(), ncol=2)
+```
+
+```{r}
+interaction_model <- lm(loglongevity ~ thorax * activity, data=data)
+anova(interaction_model)
+```
+
+
+**d)** The analysis with thorax length is more complete. Because the thorax affects all levels of the activity factor identically, the results of both analyses coincide in terms of the significance of the activity factor but this may not always be the case. Therefore, including thorax leads to a more correct model. Furthermore, the test below shows that including thorax, significantly enhances the model.
+
+```{r}
+anova(activityaov, loglongaov)
+```
+
+
+**e)** The plots below show that the longevity is likely normally distributed while the log of longevity is likely not. Further evidence for this is provided by the Shapiro-Wilk tests. The residuals for both models seem pretty good and likely normal. Since, ANOVA requires normally distributed samples, it is better to use the number of days as the response rather than the logarithm of it.
+
+```{r}
+longaov = lm(longevity ~ thorax + activity, data=data)
+
+par(mfrow=c(2, 2)); hist(data$longevity); qqnorm(data$longevity)
+hist(data$loglongevity); qqnorm(data$loglongevity)
+shapiro.test(data$longevity)[2]; shapiro.test(data$loglongevity)[2]
+
+qqnorm(residuals(loglongaov)); plot(fitted(loglongaov), residuals(loglongaov))
+qqnorm(residuals(longaov)); plot(fitted(longaov), residuals(longaov))
+```
+
+
+## Exercice 2
+
+
+**a)**
+
+
+**b)**
+
+
+**c)**
+
+
+**d)**
+
+
+**e)**
+
+
+**f)**
+
+
+**g)**
+
+
+**h)**
+
+
+**i)**
+
+
+## Exercice 3
+
+
+**a)**
+
+
+**b)**
+
+
+**c)**
