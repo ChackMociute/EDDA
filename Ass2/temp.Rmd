@@ -13,6 +13,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 library(ggplot2)
+library(glmnet)
 data <- read.table('fruitflies.txt', header = TRUE)
 data$loglongevity <- log(data$longevity)
 ```
@@ -103,31 +104,125 @@ qqnorm(residuals(longaov)); plot(fitted(longaov), residuals(longaov))
 ## Exercice 2
 
 
-**a)**
+```{r, include=FALSE}
+library(car)
+
+data <- read.csv("BirthWeight.csv")
+potential <- data[,!names(data) %in% c('ID', 'lowbwt', 'mage35', 'smoker')]
+```
 
 
-**b)**
+**a)** Spotting potential points is difficult visually in multidimensional space, but we only need to check for influence points as those are the only significant outliers. To analyze the problem of influence points, we're going to use Cook's distance. This method quantifies influence points in the dataset by measuring how much change that point contributes to in the final model. No influence points are present within the current model. This is unsurprising however, because of the high dimensionality of the data.
+
+```{r}
+# potential is a table with only the potential predictors
+model_all = lm(Birthweight ~ ., data=potential)
+cook <- as.data.frame(cooks.distance(model_all))
+length(cook[cook>=1])
+```
+
+To check collinearity we can use a correlation matrix and pairwise correlation plots. But given the large number of potential predictors, these measures would likely be overwhelming to look at and so, bad for analysis. Instead we use VIF for a more concise description of collinearity. We can see relatively little collinearity with no predictor VIF$_j$ > 5. The highest VIF value is for *fage*, which likely correlates with *mage* and potentially *fedyrs*.
+
+```{r}
+vif(model_all)
+```
 
 
-**c)**
+**b)** At the end of the loop, we can see every dropped predictor. The first was *fage* and the last *mppwt* with a total of 9 predictors dropped and 2 ones remaining. The variables left are *headcirc* and *gestation* which seem like very natural choices for estimating the birth weight of a child.
+
+```{r}
+reduced_model <- model_all
+drop = NULL
+repeat{
+  p_values = summary(reduced_model)$coefficients[,c(0, 4)]
+  max_p = max(p_values)
+  if(max_p <= 0.05) break
+  var = which.max(p_values)
+  drop = c(drop, names(var))
+  reduced_model <- update(reduced_model, as.formula(paste(". ~ . -", names(var))))
+}
+summary(reduced_model)
+drop
+```
+
+Checking for the model assumptions below we can see that there are no issues with collinearity nor outliers. The residuals seem a little off in the qq plot but a Shapiro-Wilk test (not shown here) does not reject normality.
+
+```{r}
+vif(reduced_model); paste("# of outliers: ", sum(cooks.distance(reduced_model)>1))
+par(mfrow=c(1, 2)); qqnorm(residuals(reduced_model))
+plot(fitted(reduced_model), residuals(reduced_model))
+```
 
 
-**d)**
+**c)** Below we can see the mean predicted birth weight value for the average baby with a 95% confidence and prediction interval respectively.
+
+```{r}
+average_values <- data.frame(Headcirc = mean(data$Headcirc),
+                             Gestation = mean(data$Gestation))
+predict(reduced_model, newdata = average_values, interval = "confidence")[,]
+predict(reduced_model, newdata = average_values, interval = "prediction")[,]
+```
+
+**d)** The LASSO method is a numerical optimization method rather than an analytical solution. Therefore, the MSE on the validation set is better modelled as a random variable. Moreover, the train-validation split is randomized as well, further contributing to the uncertainty not only of the LASSO model but also of the step down model. Thus, to compare the models derived with the LASSO method below with the model in **b)**, we need to train them a myriad of times. Similarly, we need to fit a different model each time for the predictors derived with the step down strategy to account for different train-validation splits. Then running ANOVA, we see that there is a significant difference among the conditions. Further investigations show that the worst model is indeed the one derived from the step down method. The best is the one that uses the 1sd $\lambda$ value. The overall difference in the MSE however is still quite small.
+
+The LASSO method, like the step down one, selected **Headcirc** and **Gestation** as significant predictors for the baby's body weight. But alongside those, it also selected **Length**.
+
+```{r}
+mse <- function(pred, y){
+  return(mean(pred - y)^2)
+}
+
+x = as.matrix(potential[,names(potential) != "Birthweight"])
+y = potential$Birthweight
+
+df <- data.frame(matrix(ncol=3,nrow=0, dimnames=list(
+  NULL, c("lambda.min", "lambda.1se", "step.down"))))
+
+for(i in 1:1000){
+  train = sample(1:nrow(x), 0.67*nrow(x))
+  x.train = x[train,]; y.train = y[train]
+  x.val = x[-train,]; y.val = y[-train]
+  
+  lasso.model = glmnet(x.train, y.train, alpha=1)
+  lasso.cv = cv.glmnet(x.train, y.train, alpha=1, type.measure="mse", nfolds=5)
+  df[nrow(df) + 1,] = c(
+  mse(predict(lasso.model, s=lasso.cv$lambda.min, newx=x.val), y.val),
+  mse(predict(lasso.model, s=lasso.cv$lambda.1se, newx=x.val), y.val),
+  mse(predict(lm(reduced_model$call[[2]], data=potential[train,]),
+              newdata=potential[-train,]), potential[-train,]$Birthweight))
+}
+anova(lm(values ~ ind, data=stack(df)))
+```
 
 
 **e)**
 
+```{r}
+```
+
 
 **f)**
+
+```{r}
+```
 
 
 **g)**
 
+```{r}
+```
+
 
 **h)**
 
+```{r}
+```
+
 
 **i)**
+
+```{r}
+```
 
 
 ## Exercice 3
@@ -135,8 +230,17 @@ qqnorm(residuals(longaov)); plot(fitted(longaov), residuals(longaov))
 
 **a)**
 
+```{r}
+```
+
 
 **b)**
 
+```{r}
+```
+
 
 **c)**
+
+```{r}
+```

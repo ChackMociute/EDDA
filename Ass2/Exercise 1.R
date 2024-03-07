@@ -52,7 +52,7 @@ anova(interaction_model)
 
 # e)
 longaov = lm(longevity ~ thorax + activity, data=data)
-anova(longaov)
+anova(longaov); summary(longaov)
 
 par(mfrow=c(2, 2)); hist(data$longevity); qqnorm(data$longevity)
 hist(data$loglongevity); qqnorm(data$loglongevity)
