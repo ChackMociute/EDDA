@@ -265,19 +265,38 @@ fisher.test(table(data[,c("lowbwt", "mage35")]))
 ## Exercice 3
 
 
-**a)**
-
-```{r}
+```{r, include=FALSE}
+data <- read.table("awards.txt", header=TRUE)
+data$prog <- as.factor(data$prog)
 ```
 
 
-**b)**
+**a)** From the model below, we can see that the number of awards acquired does not differ significantly between programs 1 and 3 but following program 2 does appear to yield significantly more awards. This is also reflected in the average number of awards seen below the model. Program 2 is the only one with an expected award to student ratio above 1.
 
 ```{r}
+poisson.model = glm(num_awards ~ prog, data=data, family=poisson)
+summary(poisson.model)
+
+# Average number of awards per program
+aggregate(num_awards ~ prog, data=data, mean)
 ```
 
 
-**c)**
+**b)** The Kruskal-Wallis test can be seen as the non-parametric counterpart to 1-way ANOVA. Given that we are examining the effects of different levels of the program factor on a numeric response variable, this test is applicable. It confirms the outcome in **a)** and shows that the program is significant.
 
 ```{r}
+kruskal.test(num_awards ~ prog, data=data)
+```
+
+
+**c)** We attempted both a model with and without interaction and found that including the interactions makes all predictors insignificant. Thus, we conclude that the better model is without interaction. The results now are somewhat different than in **a)**. Every level of the program factor now differs significantly. Furthermore, program 2 is no longer the best for amassing awards and is superseded by program 3. This is then reflected in the predictions made by the model for all 3 programs with math constant among them. Program 1 still has the fewest expected awards, but now program 3 has the most.
+
+```{r}
+poisson.full = glm(num_awards ~ prog*math, data=data, family=poisson)
+poisson.nint = glm(num_awards ~ prog + math, data=data, family=poisson)
+summary(poisson.full)
+summary(poisson.nint)
+
+newdata = data.frame(math=56, prog=factor(1:3))
+predict(poisson.nint, newdata=newdata, type="response")
 ```
