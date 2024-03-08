@@ -111,6 +111,9 @@ qqnorm(residuals(longaov)); plot(fitted(longaov), residuals(longaov))
 library(car)
 
 data <- read.csv("BirthWeight.csv")
+data$lowbwt <- as.factor(data$lowbwt)
+data$mage35 <- as.factor(data$mage35)
+data$smoker <- as.factor(data$smoker)
 potential <- data[,!names(data) %in% c('ID', 'lowbwt', 'mage35', 'smoker')]
 ```
 
@@ -203,14 +206,13 @@ anova(lm(values ~ ind, data=stack(df)))
 ```
 
 
-**e)** Below we can see how many babies were born underweight. First we discriminate by smoker and then by the mother's age. Both smoking and age seem to have a positive correlation with being born underweight. Notably, there are only four mothers over the age of 35 in the dataset which could misrepresent the actual proportion of the malnourished babies in this demographic. The bar plot indicates that smoking has a greater effect than age on low birth weight.
-
-Performing independent t-tests (not shown here) between smokers and non smokers as well as between mothers over and under 35 revealed no statistical differences.
+**e)** Below we can see how many babies were born underweight. First we discriminate by smoker and then by the mother's age. Both smoking and age seem to have a positive correlation with being born underweight. Notably, there are only four mothers over the age of 35 in the dataset which could misrepresent the actual proportion of the malnourished babies in this demographic. The bar plot indicates that smoking has a greater effect than age on low birth weight. Despite that the effect seems small and unlikely to be significant.
 
 ```{r, include=FALSE}
 uwt <- data
 uwt$smoker = factor(uwt$smoker, levels=c(0, 1), labels=c("Non smoker", "Smoker"))
 uwt$mage35 = factor(uwt$mage35, levels=c(0, 1), labels=c("Not over 35", "Over 35"))
+uwt$lowbwt = as.numeric(uwt$lowbwt) - 1
 ```
 
 ```{r, fig.height=4, fig.width=6}
@@ -221,6 +223,7 @@ tapply(uwt$lowbwt, uwt$mage35, function(x) paste(sum(x), "out of", length(x)))
 # Summary table
 xtabs(lowbwt ~ smoker + mage35, data=uwt)
 
+par(mfrow=c(1, 1))
 barplot(xtabs(lowbwt ~ smoker + mage35, data=uwt), main="Low birth weight",
         ylab="Number of underweight babies", legend=unique(uwt$smoker))
 ```
@@ -247,8 +250,7 @@ logistic.mage35 = glm(lowbwt ~ Gestation*mage35+smoker, data=data, family="binom
 ```{r}
 new = data.frame(Gestation=40, mage35=unique(data$mage35),
                  smoker=rep(unique(data$smoker), each=2))
-new$pred = predict(logistic.model, newdata=new, type="response")
-new
+new$pred = predict(logistic.model, newdata=new, type="response"); new
 ```
 
 

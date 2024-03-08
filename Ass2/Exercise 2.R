@@ -2,6 +2,9 @@ library(car)
 library(glmnet)
 
 data <- read.csv("BirthWeight.csv")
+data$lowbwt <- as.factor(data$lowbwt)
+data$mage35 <- as.factor(data$mage35)
+data$smoker <- as.factor(data$smoker)
 potential <- data[,!names(data) %in% c('ID', 'lowbwt', 'mage35', 'smoker')]
 
 
@@ -69,9 +72,7 @@ anova(lm(values ~ ind, data=stack(df)))
 uwt <- data
 uwt$smoker = factor(uwt$smoker, levels=c(0, 1), labels=c("Non smoker", "Smoker"))
 uwt$mage35 = factor(uwt$mage35, levels=c(0, 1), labels=c("Not over 35", "Over 35"))
-
-t.test(data[data$smoker==0,]$lowbwt, data[data$smoker==1,]$lowbwt)
-t.test(data[data$mage35==0,]$lowbwt, data[data$mage35==1,]$lowbwt)
+uwt$lowbwt = as.numeric(uwt$lowbwt) - 1
 
 
 # Number of underweight babies
@@ -79,6 +80,8 @@ tapply(uwt$lowbwt, uwt$smoker, function(x) paste(sum(x), "out of", length(x)))
 tapply(uwt$lowbwt, uwt$mage35, function(x) paste(sum(x), "out of", length(x)))
 
 xtabs(lowbwt ~ smoker + mage35, data=uwt)
+
+par(mfrow=c(1, 1))
 barplot(xtabs(lowbwt ~ smoker + mage35, data=uwt), main="Low birth weight",
         ylab="Number of underweight babies", legend=unique(uwt$smoker))
 
@@ -108,5 +111,3 @@ new
 # i)
 fisher.test(table(data[,c("smoker", "lowbwt")]))
 fisher.test(table(data[,c("lowbwt", "mage35")]))
-
-
