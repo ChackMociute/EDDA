@@ -12,8 +12,11 @@ editor_options:
 
 
 ```{r setup, include=FALSE}
+options(digits=3)
+
 library(ggplot2)
 library(glmnet)
+
 data <- read.table('fruitflies.txt', header = TRUE)
 data$loglongevity <- log(data$longevity)
 ```
@@ -147,7 +150,7 @@ drop
 
 Checking for the model assumptions below we can see that there are no issues with collinearity nor outliers. The residuals seem a little off in the qq plot but a Shapiro-Wilk test (not shown here) does not reject normality.
 
-```{r}
+```{r, fig.height=3, fig.width=6}
 vif(reduced_model); paste("# of outliers: ", sum(cooks.distance(reduced_model)>1))
 par(mfrow=c(1, 2)); qqnorm(residuals(reduced_model))
 plot(fitted(reduced_model), residuals(reduced_model))
@@ -163,65 +166,97 @@ predict(reduced_model, newdata = average_values, interval = "confidence")[,]
 predict(reduced_model, newdata = average_values, interval = "prediction")[,]
 ```
 
-**d)** The LASSO method is a numerical optimization method rather than an analytical solution. Therefore, the MSE on the validation set is better modelled as a random variable. Moreover, the train-validation split is randomized as well, further contributing to the uncertainty not only of the LASSO model but also of the step down model. Thus, to compare the models derived with the LASSO method below with the model in **b)**, we need to train them a myriad of times. Similarly, we need to fit a different model each time for the predictors derived with the step down strategy to account for different train-validation splits. Then running ANOVA, we see that there is a significant difference among the conditions. Further investigations show that the worst model is indeed the one derived from the step down method. The best is the one that uses the 1sd $\lambda$ value. The overall difference in the MSE however is still quite small.
+**d)** The LASSO method is a numerical optimization method rather than an analytical solution. Therefore, the MSE on the validation set is better modeled as a random variable. Moreover, the train-validation split is randomized as well, further contributing to the uncertainty not only of the LASSO model but also of the step down model. Thus, to compare the models derived with the LASSO method below with the model in **b)**, we need to train them a myriad of times. Similarly, we need to fit a different model each time for the predictors derived with the step down strategy to account for different train-validation splits. Then running ANOVA, we see that there is a significant difference among the conditions. Further investigations show that the worst model is indeed the one derived from the step down method. The best is the one that uses the 1sd $\lambda$ value. The overall difference in the MSE however is still quite small.
 
 The LASSO method, like the step down one, selected **Headcirc** and **Gestation** as significant predictors for the baby's body weight. But alongside those, it also selected **Length**.
 
 ```{r}
-mse <- function(pred, y){
+mse <- function(pred, y){ # Shortcut to get the MSE
   return(mean(pred - y)^2)
 }
 
 x = as.matrix(potential[,names(potential) != "Birthweight"])
 y = potential$Birthweight
 
-df <- data.frame(matrix(ncol=3,nrow=0, dimnames=list(
+df <- data.frame(matrix(ncol=3, nrow=0, dimnames=list(
   NULL, c("lambda.min", "lambda.1se", "step.down"))))
 
 for(i in 1:1000){
+  # New train-validation split
   train = sample(1:nrow(x), 0.67*nrow(x))
   x.train = x[train,]; y.train = y[train]
   x.val = x[-train,]; y.val = y[-train]
   
+  # Fit a new LASSO and reduced model
   lasso.model = glmnet(x.train, y.train, alpha=1)
   lasso.cv = cv.glmnet(x.train, y.train, alpha=1, type.measure="mse", nfolds=5)
+  red.mod = lm(reduced_model$call[[2]], data=potential[train,])
+  
+  # Append the MSEs to the dataframe
   df[nrow(df) + 1,] = c(
   mse(predict(lasso.model, s=lasso.cv$lambda.min, newx=x.val), y.val),
   mse(predict(lasso.model, s=lasso.cv$lambda.1se, newx=x.val), y.val),
-  mse(predict(lm(reduced_model$call[[2]], data=potential[train,]),
-              newdata=potential[-train,]), potential[-train,]$Birthweight))
+  mse(predict(red.mod, newdata=potential[-train,]), potential[-train,]$Birthweight))
 }
+
 anova(lm(values ~ ind, data=stack(df)))
 ```
 
 
-**e)**
+**e)** Below we can see how many babies were born underweight. First we discriminate by smoker and then by the mother's age. Both smoking and age seem to have a positive correlation with being born underweight. Notably, there are only four mothers over the age of 35 in the dataset which could misrepresent the actual proportion of the malnourished babies in this demographic. The bar plot indicates that smoking has a greater effect than age on low birth weight.
 
-```{r}
+Performing independent t-tests (not shown here) between smokers and non smokers as well as between mothers over and under 35 revealed no statistical differences.
+
+```{r, include=FALSE}
+uwt <- data
+uwt$smoker = factor(uwt$smoker, levels=c(0, 1), labels=c("Non smoker", "Smoker"))
+uwt$mage35 = factor(uwt$mage35, levels=c(0, 1), labels=c("Not over 35", "Over 35"))
+```
+
+```{r, fig.height=4, fig.width=6}
+# Number of underweight babies
+tapply(uwt$lowbwt, uwt$smoker, function(x) paste(sum(x), "out of", length(x)))
+tapply(uwt$lowbwt, uwt$mage35, function(x) paste(sum(x), "out of", length(x)))
+
+# Summary table
+xtabs(lowbwt ~ smoker + mage35, data=uwt)
+
+barplot(xtabs(lowbwt ~ smoker + mage35, data=uwt), main="Low birth weight",
+        ylab="Number of underweight babies", legend=unique(uwt$smoker))
 ```
 
 
-**f)**
+**f)** The logistic regression model appears in line with what we have seen in **e)**, which is to say that smoking and old age do not significantly contribute to low birth weight. On the other hand, the explanatory variable gestation did have a significant effect. The way it can be interpreted is that one unit increase in gestation multiplies the odds of being born underweight by $e^{-1.463}$. In other words, gestation corresponds to a reduced likelihood of a low weight birth.
 
 ```{r}
+logistic.model = glm(lowbwt ~ Gestation+smoker+mage35, data=data, family="binomial")
+summary(logistic.model)
 ```
 
 
-**g)**
+**g)** In both cases, the interactions are insignificant, and in the case of the model with smoker:Gestation interaction, all predictors lost their significance. Thus, it is best to stick to the model in **f)** which was the simplest while still explaining the most data. 
 
-```{r}
+```{r, warning=FALSE}
+logistic.smoker = glm(lowbwt ~ Gestation*smoker+mage35, data=data, family="binomial")
+logistic.mage35 = glm(lowbwt ~ Gestation*mage35+smoker, data=data, family="binomial")
 ```
 
 
-**h)**
+**h)** As expected, the lowest probability of a low weight birth is when the mother is young and does not smoke. Smoking has a bigger influence than age on pushing the probability towards such a birth and the synergy of both leads to the highest odds of *lowbwt*. Regardless, both smoking and age are overshadowed by gestation leading to overall very slim chances of abnormally low birth weights across the board.
 
 ```{r}
+new = data.frame(Gestation=40, mage35=unique(data$mage35),
+                 smoker=rep(unique(data$smoker), each=2))
+new$pred = predict(logistic.model, newdata=new, type="response")
+new
 ```
 
 
-**i)**
+**i)** We create contingency tables for *smoker*/*lowbwt* and *mage35*/*lowbwt* to examine the question outlined in **e)**. Then, we attempted to use the `chisq.test` to determine if these factors were related but because in both cases half of $E_{ij}<5$, the $\chi^2$ approximation is unreliable. Luckily, these are $2x2$ tables so we can use Fisher's exact test instead. Just as before, we find no significant relation between smoking/age and low birth weight.
 
-```{r}
+```{r, warning=FALSE}
+fisher.test(table(data[,c("smoker", "lowbwt")]))
+fisher.test(table(data[,c("lowbwt", "mage35")]))
 ```
 
 

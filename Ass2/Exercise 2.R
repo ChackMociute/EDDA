@@ -65,23 +65,48 @@ for(i in 1:1000){
 anova(lm(values ~ ind, data=stack(df)))
 
 
+# e)
+uwt <- data
+uwt$smoker = factor(uwt$smoker, levels=c(0, 1), labels=c("Non smoker", "Smoker"))
+uwt$mage35 = factor(uwt$mage35, levels=c(0, 1), labels=c("Not over 35", "Over 35"))
+
+t.test(data[data$smoker==0,]$lowbwt, data[data$smoker==1,]$lowbwt)
+t.test(data[data$mage35==0,]$lowbwt, data[data$mage35==1,]$lowbwt)
 
 
+# Number of underweight babies
+tapply(uwt$lowbwt, uwt$smoker, function(x) paste(sum(x), "out of", length(x)))
+tapply(uwt$lowbwt, uwt$mage35, function(x) paste(sum(x), "out of", length(x)))
+
+xtabs(lowbwt ~ smoker + mage35, data=uwt)
+barplot(xtabs(lowbwt ~ smoker + mage35, data=uwt), main="Low birth weight",
+        ylab="Number of underweight babies", legend=unique(uwt$smoker))
 
 
+# f)
+logistic.model = glm(lowbwt ~ Gestation + smoker + mage35, data=data, family="binomial")
+summary(logistic.model)
 
 
+# g)
+logistic.smoker = glm(lowbwt ~ Gestation * smoker + mage35, data=data, family="binomial")
+summary(logistic.smoker)
+
+logistic.mage35 = glm(lowbwt ~ Gestation * mage35 + smoker, data=data, family="binomial")
+summary(logistic.mage35)
+
+anova(logistic.model, logistic.mage35)
 
 
+# h)
+new = data.frame(Gestation=40, mage35=unique(data$mage35),
+                 smoker=rep(unique(data$smoker), each=2))
+new$pred = predict(logistic.model, newdata=new, type="response")
+new
 
 
-
-
-
-
-
-
-
-
+# i)
+fisher.test(table(data[,c("smoker", "lowbwt")]))
+fisher.test(table(data[,c("lowbwt", "mage35")]))
 
 
